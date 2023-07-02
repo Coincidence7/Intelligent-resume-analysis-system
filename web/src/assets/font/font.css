@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Tazugane';
+    src: url('Tazugane-SC.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Yantian';
+    src: url('岩田UD黑体.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'YaHei-Consolas';
+    src: url('YaHei-Consolas-Hybrid.ttf');
+    font-weight: normal;
+    font-style: normal;
+}

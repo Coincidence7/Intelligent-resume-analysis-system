@@ -1,34 +1,60 @@
 <template>
-
-  <router-view/>
+    <div class="common-layout">
+        <el-container>
+            <el-header class="navbar">
+                <NavBar/>
+            </el-header>
+            <el-container>
+                <el-aside class="sidebar">
+                    <SideBar/>
+                </el-aside>
+                <el-main class="main">
+                    <router-view/>
+                </el-main>
+            </el-container>
+        </el-container>
+    </div>
 </template>
+
+
 <script>
-import "bootstrap/dist/css/bootstrap.min.css"
-import "bootstrap/dist/js/bootstrap"
+
+import NavBar from "@/components/basic/NavBar";
+import SideBar from "@/components/basic/SideBar";
+import "@/assets/font/font.css";
 export default {
-
+  name: 'app',
+  components: {
+      SideBar,
+      NavBar,
+  }
 }
-
 </script>
+
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+    font-family: Yantian;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
 }
-
-#nav {
-  padding: 30px;
+.navbar {
+    height: 4rem;
+    --el-header-padding: 0 0;
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.sidebar {
+    width: 14rem;
+    height: calc(100vh - 6rem);
+    margin-left: 0rem;
 }
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.main {
+    position: absolute;
+    left: 14rem;
+    right: 0;
+    top: 4rem;
+    bottom: 0;
+    overflow-y: scroll;
+    /*上右下左*/
+    padding: 1rem 10vw 1rem 3rem;
 }
 </style>

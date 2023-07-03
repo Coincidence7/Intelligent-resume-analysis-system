@@ -45,6 +45,11 @@
                     :icon=CircleClose
                     @click="statusChangeHandler('stop')"
                 >中止分析</el-button>
+                <el-button
+                    type="success" plain
+                    :icon=Finished
+                    @click=""
+                >查看结果</el-button>
             </el-row>
             &nbsp;
             <el-row>
@@ -121,12 +126,13 @@
 <script>
 
 import {reactive, ref} from "vue";
+import router from '@/router';
 
 export default {
     name: "AnalyseWaitingView",
 
     setup() {
-        const {PieChart, CircleClose, VideoPlay, VideoPause} = require('@element-plus/icons-vue');
+        const {PieChart, CircleClose, Finished, VideoPlay, VideoPause} = require('@element-plus/icons-vue');
         const status = ref('');
         const estimateTime = ref(0);
         const activeCollapse = ref(['1', '2']);
@@ -287,9 +293,12 @@ export default {
         const statusChangeHandler = (newStatus) => {
             status.value = newStatus;
         }
+        const viewResultHandler = () => {
+            router.push({ name:"mainPage" });
+        }
 
         return {
-            PieChart, CircleClose, VideoPlay, VideoPause,
+            PieChart, CircleClose, Finished, VideoPlay, VideoPause,
             activeCollapse,
             debugForm,
             debugTerminal,
@@ -302,6 +311,7 @@ export default {
             pauseHandler,
             abortHandler,
             statusFilterHandler,
+            viewResultHandler,
         };
     }
 }

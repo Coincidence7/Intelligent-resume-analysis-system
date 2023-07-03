@@ -1,5 +1,7 @@
 <template>
-
+    <el-row>
+        <p style="font-size: 25px; color: #666666">岗位管理</p>
+    </el-row>
 </template>
 
 <script>

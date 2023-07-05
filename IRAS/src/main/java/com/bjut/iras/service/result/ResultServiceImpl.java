@@ -6,8 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bjut.iras.mapper.ResultMapper;
 import com.bjut.iras.pojo.result;
-import com.bjut.iras.pojo.ticket;
-import com.bjut.iras.service.ServiceConsts;
+import com.bjut.iras.service.QueryConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ public class ResultServiceImpl implements ResultService{
 
     private HashMap<String, String> getResultsFromQueryWrapper(QueryWrapper<result> qw, Integer page) {
 
-        IPage<result> resultIPage = new Page<>(page, ServiceConsts.resultPageCapacity);
+        IPage<result> resultIPage = new Page<>(page, QueryConstants.resultPageCapacity);
         List<result> results = resultMapper.selectPage(resultIPage, qw).getRecords();
 
         if (results.size() == 0) {
@@ -39,7 +38,7 @@ public class ResultServiceImpl implements ResultService{
         }
         HashMap<String, String> retMap = new HashMap<>();
         retMap.put("results", jobj.toJSONString());
-        retMap.put("size", Integer.toString(Math.max(ServiceConsts.resultPageCapacity, results.size())));
+        retMap.put("size", Integer.toString(Math.min(QueryConstants.resultPageCapacity, results.size())));
 
         return retMap;
     }

@@ -4,12 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.bjut.iras.mapper.ResultMapper;
 import com.bjut.iras.mapper.TicketMapper;
-import com.bjut.iras.pojo.result;
-import com.bjut.iras.pojo.resume;
 import com.bjut.iras.pojo.ticket;
-import com.bjut.iras.service.ServiceConsts;
+import com.bjut.iras.service.QueryConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +23,7 @@ public class TicketServiceImpl implements TicketService {
 
     private HashMap<String, String> getTicketsFromQueryWrapper(QueryWrapper<ticket> qw, Integer page) {
 
-        IPage<ticket> ticketPage = new Page<>(page, ServiceConsts.ticketPageCapacity);
+        IPage<ticket> ticketPage = new Page<>(page, QueryConstants.ticketPageCapacity);
         List<ticket> tickets = ticketMapper.selectPage(ticketPage, qw).getRecords();
 
         if (tickets.size() == 0) {
@@ -41,7 +38,7 @@ public class TicketServiceImpl implements TicketService {
         }
         HashMap<String, String> retMap = new HashMap<>();
         retMap.put("results", jobj.toJSONString());
-        retMap.put("size", Integer.toString(Math.max(ServiceConsts.resultPageCapacity, tickets.size())));
+        retMap.put("size", Integer.toString(Math.min(QueryConstants.resultPageCapacity, tickets.size())));
 
         return retMap;
     }

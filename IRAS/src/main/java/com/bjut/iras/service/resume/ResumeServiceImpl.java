@@ -63,7 +63,7 @@ public class ResumeServiceImpl implements ResumeService {
         return getResumesFromQueryWrapper(qw, page);
     }
 
-    public Map<String, String> getResumeByFilterMap(Map<String, String> filters, Integer page) {
+    public Map<String, String> getResumeByFilterMap(Map<String, String> filters, Boolean isDesc, Integer page) {
 
         QueryWrapper<resume> qw = new QueryWrapper<>();
 
@@ -76,8 +76,12 @@ public class ResumeServiceImpl implements ResumeService {
             if (filterType == QueryConstants.byKey) {
                 qw.eq("resumekey", e.getValue());
 
+                if (isDesc) qw.orderByDesc("resumekey");
+
             } else if (filterType == QueryConstants.byName) {
                 qw.like("resumename", e.getValue());
+
+                if (isDesc) qw.orderByDesc("resumekey");
 
             } else if (filterType == QueryConstants.byBetweenDate) {
                 String[] dateStrs = e.getValue().split("&");
@@ -86,11 +90,14 @@ public class ResumeServiceImpl implements ResumeService {
                 qw.apply("DATE(uploadtime) <= STR_TO_DATE('"
                         + dateStrs[1] + "', '%Y-%m-%d')");
 
+                if (isDesc) qw.orderByDesc("uploadtime");
+
             } else if (filterType == QueryConstants.byFromDate) {
                 qw.ge("uploadtime", e.getValue());
 
+                if (isDesc) qw.orderByDesc("uploadtime");
+
             }
-            qw.or();
         }
         return getResumesFromQueryWrapper(qw, page);
     }
@@ -106,7 +113,7 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
-    public int deleteResumes(ArrayList<Integer> resumekeys) {
+    public int deleteResume(ArrayList<Integer> resumekeys) {
         QueryWrapper<resume> qw = new QueryWrapper<>();
         qw.in("resumekey", resumekeys);
         return resumeMapper.delete(qw);

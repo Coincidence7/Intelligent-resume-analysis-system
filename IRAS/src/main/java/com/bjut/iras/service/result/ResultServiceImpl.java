@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.bjut.iras.mapper.ResultMapper;
 import com.bjut.iras.pojo.result;
+import com.bjut.iras.pojo.resume;
 import com.bjut.iras.service.QueryConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,46 @@ public class ResultServiceImpl implements ResultService{
     }
 
     @Override
+    public Map<String, String> getResultByFilterMap(Map<String, String> filters, Boolean isDesc, Integer page) {
+
+        QueryWrapper<result> qw = new QueryWrapper<>();
+
+        for (Map.Entry<String, String> e : filters.entrySet()) {
+            if (QueryConstants.supportedResultFilters.get(e.getKey()) == null) {
+                throw new RuntimeException("Unsupported filter type: " + e.getKey() + ".");
+
+            }
+            int filterType = QueryConstants.supportedResultFilters.get(e.getKey());
+            if (filterType == QueryConstants.byKey) {
+                qw.eq("resultkey", e.getValue());
+
+                if (isDesc) qw.orderByDesc("resultkey");
+
+            } else if (filterType == QueryConstants.byName) {
+                qw.like("resumename", e.getValue());
+
+                if (isDesc) qw.orderByDesc("resultkey");
+
+            } else if (filterType == QueryConstants.byBetweenDate) {
+                String[] dateStrs = e.getValue().split("&");
+                qw.apply("DATE(createdtime) >= STR_TO_DATE('"
+                        + dateStrs[0] + "', '%Y-%m-%d')");
+                qw.apply("DATE(createdtime) <= STR_TO_DATE('"
+                        + dateStrs[1] + "', '%Y-%m-%d')");
+
+                if (isDesc) qw.orderByDesc("createdtime");
+
+            } else if (filterType == QueryConstants.byFromDate) {
+                qw.ge("createdtime", e.getValue());
+
+                if (isDesc) qw.orderByDesc("createdtime");
+
+            }
+        }
+        return getResultsFromQueryWrapper(qw, page);
+    }
+
+    @Override
     public int writeResult(ArrayList<result> results) {
         int successCnt = 0;
         for (result r : results) {
@@ -74,7 +115,7 @@ public class ResultServiceImpl implements ResultService{
     }
 
     @Override
-    public int deleteResults(ArrayList<Integer> resultkeys) {
+    public int deleteResult(ArrayList<Integer> resultkeys) {
         QueryWrapper<result> qw = new QueryWrapper<>();
         qw.in("resultkey", resultkeys);
         return resultMapper.delete(qw);

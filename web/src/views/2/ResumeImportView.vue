@@ -91,7 +91,8 @@
             <el-upload
                 class="upload"
                 drag
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                action="http://127.0.0.1:3000/upload/"
+                :on-change="onUploadChange"
                 multiple="true"
                 show-file-list="true"
             >
@@ -120,6 +121,8 @@ import {ref} from 'vue';
 import {UploadFilled} from '@element-plus/icons-vue'
 import {computed} from "@vue/reactivity";
 import router from '@/router';
+import { useStore } from "vuex"
+
 
 export default {
     name: "ResumeImportView",
@@ -128,6 +131,8 @@ export default {
     },
 
     setup() {
+        const store = useStore()
+        const files = ref([])
         const {Delete, Document, Filter, PieChart} = require('@element-plus/icons-vue');
         const typeFilterDict = ref([
             {text: '图片', value: 'img'},
@@ -285,8 +290,15 @@ export default {
         const startAnalyse = () => {
             router.push({name: 'analyse_waiting'});
         }
-
+        
+        const onUploadChange = (file) =>{            
+            console.log(file.raw)
+            console.log(store)
+            
+        }
         return {
+            onUploadChange,
+            files,
             Delete, Document, Filter, PieChart,
             uploadInfo,
             uploadList,

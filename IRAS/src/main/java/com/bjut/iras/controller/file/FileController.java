@@ -21,8 +21,9 @@ public class FileController {
     FileService fileService;
 
     @PostMapping("/upload/")
-    public Map<String, String> saveFile(@RequestParam("file") MultipartFile file){
-            return fileService.getUserUploadFiles(file);
+    public Map<String, String> saveFile(@RequestParam("file") MultipartFile[] file){
+        System.out.println("对上传文件进行解析");
+        return fileService.getUserUploadFiles(file);
     }
     
 }

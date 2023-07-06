@@ -95,6 +95,7 @@
                 :on-change="onUploadChange"
                 multiple="true"
                 show-file-list="true"
+                :on-success="getRetData"
             >
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                 <div class="el-upload__text">
@@ -121,7 +122,6 @@ import {ref} from 'vue';
 import {UploadFilled} from '@element-plus/icons-vue'
 import {computed} from "@vue/reactivity";
 import router from '@/router';
-import { useStore } from "vuex"
 
 
 export default {
@@ -131,8 +131,6 @@ export default {
     },
 
     setup() {
-        const store = useStore()
-        const files = ref([])
         const {Delete, Document, Filter, PieChart} = require('@element-plus/icons-vue');
         const typeFilterDict = ref([
             {text: '图片', value: 'img'},
@@ -290,15 +288,14 @@ export default {
         const startAnalyse = () => {
             router.push({name: 'analyse_waiting'});
         }
-        
-        const onUploadChange = (file) =>{            
-            console.log(file.raw)
-            console.log(store)
-            
+        const getRetData = (response, file, fileList) =>{
+            // response.data 是解析后的json
+            console.log(response)
+            console.log(file)
+            console.log(fileList)
         }
         return {
-            onUploadChange,
-            files,
+            getRetData,
             Delete, Document, Filter, PieChart,
             uploadInfo,
             uploadList,

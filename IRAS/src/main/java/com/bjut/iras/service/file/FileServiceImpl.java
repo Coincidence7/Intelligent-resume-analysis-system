@@ -1,16 +1,30 @@
 package com.bjut.iras.service.file;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.bjut.iras.controller.parser.ResumeController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -25,39 +39,84 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public Map<String, String> getUserUploadFiles(MultipartFile file) {
+    public Map<String, String> getUserUploadFiles(MultipartFile[] files) {
 
         HashMap<String, String> ret = new HashMap<>();
+        JSONArray jsonArray = new JSONArray();
+        List<FileSystemResource> UpLoadFiles = new ArrayList<>();
 
-        String originalFilename = file.getOriginalFilename();
-        String contentType = file.getContentType();
-        String name = file.getName();
 
-        Resource resource = file.getResource();
+        for(int i = 0; i < files.length; i++){
+            JSONObject jsonObject = new JSONObject();
+            MultipartFile file = files[i];
+            String originalFilename = file.getOriginalFilename();
+            String contentType = file.getContentType();
+            String name = file.getName();
 
-        long l = System.currentTimeMillis();
+            long l = System.currentTimeMillis();
 
-        String fileNames = l + "." + originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        String uploadDesk = "D:\\uploadFiles\\text\\";
-        File finalFile = new File(uploadDesk + fileNames);
+            String fileNames = l + "." + originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            String uploadDesk = "D:\\uploadFiles\\raw\\";
+            File finalFile = new File(uploadDesk + fileNames);
+            File file1 = new File(uploadDesk + "1" + fileNames);
+            if(!finalFile.getParentFile().exists()){
+                finalFile.getParentFile().mkdirs();
+            }
+            try{
+                //file.transferTo(finalFile);
+                jsonObject.put("original name", originalFilename);
+                jsonObject.put("error_message", "success");
+                jsonObject.put("file path", uploadDesk + fileNames);
+                // 获取文件名
+                try (OutputStream out = new FileOutputStream(finalFile)) {
+                    // 输入流和输出流之间的拷贝
+                    FileCopyUtils.copy(file.getInputStream(), out);
+                } catch (IOException e) {
+                    System.out.println("上传的文件转换异常" + e.getMessage());
+                }
 
-        if(!finalFile.getParentFile().exists()){
-            finalFile.getParentFile().mkdirs();
+                try (OutputStream out = new FileOutputStream(file1)) {
+                    // 输入流和输出流之间的拷贝
+                    FileCopyUtils.copy(file.getInputStream(), out);
+                } catch (IOException e) {
+                    System.out.println("上传的文件转换异常" + e.getMessage());
+                }
+                //从File句柄创建一个新的FileSystemResource
+                FileSystemResource resource = new FileSystemResource(finalFile);
+                UpLoadFiles.add(resource);
+
+                FileSystemResource resource1 = new FileSystemResource(file1);
+                UpLoadFiles.add(resource1);
+
+            }catch (Exception e){
+                e.printStackTrace();
+                jsonObject.put("error_message", "fail");
+                jsonArray.add(jsonObject);
+            }
         }
-        try{
-            file.transferTo(finalFile);
-            ret.put("error_message", "上传成功");
-            ret.put("file path", uploadDesk + fileNames);
-            // 调用微服务
-            MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
-            data.add("input_path", "D:\\uploadFiles\\text\\" + fileNames);
-            data.add("output_path", "output");
-            restTemplate.postForObject("http://127.0.0.1:3001/", data, String.class);
-            return ret;
-        }catch (Exception e){
-            e.printStackTrace();
-            ret.put("error_message", "上传失败");
-            return ret;
-        }
+
+        // 构建请求头
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("appCode", "platform-device");
+        requestHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+        // 构建请求体
+        MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("upload_files_num", UpLoadFiles.size());;
+        System.out.println(UpLoadFiles.size());
+        requestBody.addAll("upload_files[]", UpLoadFiles);
+
+        // 发送上传请求
+        HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(requestBody, requestHeaders);
+
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://127.0.0.1:3001",
+                requestEntity, String.class);
+
+        System.out.println(responseEntity.getBody());
+
+        ret.put("error_message", "success");
+        ret.put("data", responseEntity.getBody());
+        ret.put("orginal data", jsonArray.toString());
+
+        return ret;
     }
 }

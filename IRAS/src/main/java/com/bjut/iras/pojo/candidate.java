@@ -15,6 +15,7 @@ public class candidate {
     @TableId(type = IdType.AUTO)
     private Integer candkey;
 
+    private String candname;
     private Integer candage;
     private Short candgender;
     private String candemail;

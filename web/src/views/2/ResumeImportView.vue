@@ -91,9 +91,12 @@
             <el-upload
                 class="upload"
                 drag
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                action=""
+                :auto-upload="false"
+                :on-change="onUploadChange"
                 multiple="true"
                 show-file-list="true"
+                :on-success="getRetData"
             >
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                 <div class="el-upload__text">
@@ -119,7 +122,9 @@ import {ref} from 'vue';
 // import {TableInstance} from 'element-plus'
 import {UploadFilled} from '@element-plus/icons-vue'
 import {computed} from "@vue/reactivity";
-import router from '@/router';
+// import router from '@/router';
+import $ from 'jquery'
+import { useStore } from 'vuex'
 
 export default {
     name: "ResumeImportView",
@@ -129,6 +134,8 @@ export default {
 
     setup() {
         const {Delete, Document, Filter, PieChart} = require('@element-plus/icons-vue');
+        let myFileList = []
+        const store = useStore();
         const typeFilterDict = ref([
             {text: '图片', value: 'img'},
             {text: 'PDF', value: 'pdf'},
@@ -152,110 +159,6 @@ export default {
                 type:       'doc',
                 filename:   'fdsjkanrbad.doc',
                 status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsbegaad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsbegaad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsbegaad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
         ]);
         const search = ref('');
         const filteredUploadList = computed(() => {
@@ -264,6 +167,39 @@ export default {
             //         data.name.toLowerCase().includes(search.value.toLowerCase())
             // });
         });
+        
+        const getUploadList = () =>{
+            $.ajax({
+                type: 'post',
+                url: store.state.httpUrl + "resume/List/",
+                success: (resp) =>{
+                    uploadList.value = []
+                    JSON.parse(resp.data).forEach(element => {
+                        let type = element.path.substring(element.path.lastIndexOf('.') + 1)
+                        uploadList.value.push({
+                            index:      element.resumekey,
+                            type:       type,
+                            filename:   element.filename,
+                            status:     element.state,           
+                        })
+                    });
+                    console.log()
+                },
+                error: (resp) =>{
+                    console.log(resp)
+                }
+            })
+        }
+
+        getUploadList();
+        const onUploadChange = (file, fileList) =>{
+            // console.log(file.status)
+            myFileList = []
+            fileList.forEach(element => {
+                myFileList.push(element)
+            });
+            // console.log(myFileList)
+        }
         const selectionChangeHandler = () => {
 
         };
@@ -283,10 +219,41 @@ export default {
 
         }
         const startAnalyse = () => {
-            router.push({name: 'analyse_waiting'});
-        }
+            // router.push({name: 'analyse_waiting'});
+            // 开始简历解析
+            // 获取文件列表
+            let myFormData = new FormData()
+            myFileList.forEach(file => {
+                myFormData.append(file.name, file.raw)
+            });
+            // 新增一条数据     
+            $.ajax({
+                type: 'POST',
+                url: store.state.httpUrl + "upload/",
+                data: myFormData,
+                processData: false,
+                contentType: false,
+                success: (resp) =>{
+                    console.log(resp)
+                    
 
+                },
+                error: (resp)=>{
+                    console.log(resp)
+                }
+            })
+           
+       
+        }
+        const getRetData = (response, file, fileList) =>{
+            // response.data 是解析后的json
+            console.log(response)
+            console.log(file)
+            console.log(fileList)
+        }
         return {
+            onUploadChange,
+            getRetData,
             Delete, Document, Filter, PieChart,
             uploadInfo,
             uploadList,

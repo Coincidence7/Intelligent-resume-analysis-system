@@ -45,10 +45,10 @@
                     :icon=CircleClose
                     @click="statusChangeHandler('stop')"
                 >中止分析</el-button>
+                <!-- @click="" -->
                 <el-button
                     type="success" plain
                     :icon=Finished
-                    @click=""
                 >查看结果</el-button>
             </el-row>
             &nbsp;

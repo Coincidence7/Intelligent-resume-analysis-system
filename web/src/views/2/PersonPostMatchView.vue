@@ -1,7 +1,9 @@
 <template>
-    <el-row>
-        <p style="font-size: 25px; color: #666666">人岗匹配</p>
-    </el-row>
+    <div>
+        <el-row>
+            <p style="font-size: 25px; color: #666666">人岗匹配</p>
+        </el-row>
+    </div>
 </template>
 
 <script>

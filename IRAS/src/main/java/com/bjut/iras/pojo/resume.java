@@ -13,8 +13,9 @@ import java.sql.Timestamp;
 public class resume {
     @TableId(type = IdType.AUTO)
     private Integer resumekey;
-
     private String resumename;
     private String path;
+    private String filename;
     private Timestamp uploadtime;
+    private String state;
 }

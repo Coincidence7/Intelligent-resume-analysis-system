@@ -48,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(
+                        "/resume/List/",
                         "/upload/",
                         "/test/",
                         "/user/account/token/",

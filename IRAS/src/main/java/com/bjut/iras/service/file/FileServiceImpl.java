@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.bjut.iras.controller.parser.ResumeController;
 import com.bjut.iras.pojo.resume;
 import com.bjut.iras.service.resume.ResumeService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -20,17 +21,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
+@Log
 @Service
 public class FileServiceImpl implements FileService {
 
@@ -46,7 +46,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public Map<String, String> getUserUploadFiles(MultipartFile[] files) {
+    public Map<String, String> getUserUploadFiles(String[] alias, MultipartFile[] files) {
 
         HashMap<String, String> ret = new HashMap<>();
         JSONArray jsonArray = new JSONArray();
@@ -55,8 +55,10 @@ public class FileServiceImpl implements FileService {
 
 
         for(int i = 0; i < files.length; i++){
+
             JSONObject jsonObject = new JSONObject();
             MultipartFile file = files[i];
+            String aliasFilename = alias[i];
             String originalFilename = file.getOriginalFilename();
             String contentType = file.getContentType();
             String name = file.getName();
@@ -70,25 +72,28 @@ public class FileServiceImpl implements FileService {
                 finalFile.getParentFile().mkdirs();
             }
             try{
-                jsonObject.put("original name", originalFilename);
+                jsonObject.put("alias", aliasFilename);
+                jsonObject.put("original_name", originalFilename);
                 jsonObject.put("error_message", "success");
-                jsonObject.put("file path", uploadDesk + fileNames);
+                jsonObject.put("file_path", uploadDesk + fileNames);
                 // 获取文件名
                 try (OutputStream out = new FileOutputStream(finalFile)) {
                     // 输入流和输出流之间的拷贝
                     FileCopyUtils.copy(file.getInputStream(), out);
                 } catch (IOException e) {
-                    System.out.println("上传的文件转换异常" + e.getMessage());
+                    log.log(Level.SEVERE,"上传的文件转换异常" + e.getMessage());
                 }
                 resume myResume = new resume();
                 myResume.setPath(uploadDesk + fileNames);
                 myResume.setResumename("简历");
                 myResume.setFilename(originalFilename);
                 myResume.setState("doing");
+                myResume.setType(originalFilename.substring(originalFilename.lastIndexOf('.') + 1));
                 myResume.setUploadtime(new Timestamp(System.currentTimeMillis()));
                 resumes.add(myResume);
                 FileSystemResource resource = new FileSystemResource(finalFile);
                 UpLoadFiles.add(resource);
+                jsonArray.add(jsonObject);
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -96,31 +101,42 @@ public class FileServiceImpl implements FileService {
                 jsonArray.add(jsonObject);
             }
         }
-        for (resume item: resumes) {
-            System.out.println(item);
-        }
+
         resumeService.writeResume(resumes);
+
+        JSONArray resumeKeys = new JSONArray();
+
+        for (resume item: resumes){
+            resumeKeys.add(item.getResumekey());
+        }
         // 构建请求头
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.add("appCode", "platform-device");
         requestHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+
         // 构建请求体
         MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+
         requestBody.add("upload_files_num", UpLoadFiles.size());
-        System.out.println(UpLoadFiles.size());
         requestBody.addAll("upload_files[]", UpLoadFiles);
 
         // 发送上传请求
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(requestBody, requestHeaders);
-
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://10.18.25.4:3001",
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://127.0.0.1:3001",
                 requestEntity, String.class);
 
-        System.out.println(responseEntity.getBody());
+        log.log(Level.INFO, responseEntity.getBody().toString());
 
-        ret.put("error_message", "success");
-        ret.put("data", responseEntity.getBody());
-        ret.put("orginal data", jsonArray.toString());
+        JSONObject obj = JSON.parseObject(responseEntity.getBody());
+        if("success".equals(obj.getString("error_message"))){
+            ret.put("error_message", "success");
+            ret.put("data", obj.getString("data"));
+        }else {
+            ret.put("error_message", "fail");
+            ret.put("data", obj.getString("reason"));
+        }
+        ret.put("original_data", jsonArray.toString());
+        ret.put("resume_keys", resumeKeys.toString());
 
         return ret;
     }

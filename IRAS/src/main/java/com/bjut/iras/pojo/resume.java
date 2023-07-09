@@ -16,6 +16,7 @@ public class resume {
     private String resumename;
     private String path;
     private String filename;
+    private String type;
     private Timestamp uploadtime;
     private String state;
 }

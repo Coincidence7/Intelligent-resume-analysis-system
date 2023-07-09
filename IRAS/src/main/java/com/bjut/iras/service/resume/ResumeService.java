@@ -13,4 +13,6 @@ public interface ResumeService {
     public Map<String, String> getResumeByFilterMap(Map<String, String> filters, Boolean isDesc, Integer page);
     public int writeResume(ArrayList<resume> resumes);
     public int deleteResume(ArrayList<Integer> resumekeys);
+    public resume getResumeByKey(Integer resumekey);
+    public int updateResumeByKey(resume resume);
 }

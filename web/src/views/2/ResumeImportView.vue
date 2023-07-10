@@ -4,7 +4,7 @@
     </el-row>
     <el-row>
 <!--    表格部分-->
-        <el-col :span="13">
+        <el-col :span="14">
             <el-table 
                 ref="multipleTable"
                 style="width: 100%"  max-height=65vh
@@ -24,7 +24,7 @@
                     :filter-method=typeFilterHandler
                     filter-placement="bottom-end"
                 ></el-table-column>
-                <el-table-column prop="filename" label="文件名" width="450"></el-table-column>
+                <el-table-column prop="filename" label="文件名" width="450" show-overflow-tooltip></el-table-column>
                 <el-table-column
                     prop="status" label="上传状态"
                     fixed="right" align="center" width="100"
@@ -72,7 +72,7 @@
         </el-col>
         <el-col :span="1"/>
 <!--    上传部分-->
-        <el-col :span="10">
+        <el-col :span="9">
             <el-form :inline="true" :model=uploadInfo class="demo-form">
                 <el-form-item label="上传名称">
                     <el-input
@@ -261,8 +261,8 @@ export default {
         const filterResetHandler = () => {
            proxy.$refs.multipleTable.clearFilter()
         }
-        const previewHandler = () => {
-
+        const previewHandler = (index, row) => {
+            console.log(index, row);
         }
         const startAnalyse = () => {
   

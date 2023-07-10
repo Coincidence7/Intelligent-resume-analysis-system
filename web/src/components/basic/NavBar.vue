@@ -8,7 +8,13 @@
         @select="handleSelect"
     >
         <div class="logo-text">
-            <el-button class="back-btn" size="large" type="info" :icon="Back" plain/>
+            <el-button
+                class="back-btn"
+                size="large"
+                type="info"
+                :icon="Back" plain
+                @click="pageBack"
+            />
             <strong id="title">GustingBamboo - 智能简历分析系统</strong>
         </div>
         <div class="flex-grow" />
@@ -122,7 +128,9 @@ export default {
         let isLogin = ref(false);
         let isRegister = ref(false);
         let error_msg = ref(' ');
-
+        const pageBack = () => {
+            window.location.href="javascript:history.go(-1)";
+        }
         const login = () => {
             isLogin.value = true;
             isRegister.value = false;
@@ -146,6 +154,7 @@ export default {
             isLogin,
             isRegister,
             error_msg,
+            pageBack,
             login,
             register,
             logout,

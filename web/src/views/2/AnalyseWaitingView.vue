@@ -45,6 +45,7 @@
                 <el-button
                     type="success" plain
                     :icon=Finished
+                    @click=viewResultHandler
                 >查看结果</el-button>
             </el-row>
             &nbsp;
@@ -209,7 +210,7 @@ export default {
             store.commit("stopParse")
         }
         const viewResultHandler = () => {
-            router.push({ name:"mainPage" });
+            router.push({ name:"analyse_result" });
         }
 
         return {

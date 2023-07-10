@@ -63,6 +63,11 @@ public class ResumeServiceImpl implements ResumeService {
         return getResumesFromQueryWrapper(qw, page);
     }
 
+    @Override
+    public resume getResumeByKey(Integer resumekey) {
+        return resumeMapper.selectById(resumekey);
+    }
+
     public Map<String, String> getResumeByFilterMap(Map<String, String> filters, Boolean isDesc, Integer page) {
 
         QueryWrapper<resume> qw = new QueryWrapper<>();
@@ -117,6 +122,11 @@ public class ResumeServiceImpl implements ResumeService {
         QueryWrapper<resume> qw = new QueryWrapper<>();
         qw.in("resumekey", resumekeys);
         return resumeMapper.delete(qw);
+    }
+
+    @Override
+    public int updateResumeByKey(resume resume) {
+        return resumeMapper.updateById(resume);
     }
 
 }

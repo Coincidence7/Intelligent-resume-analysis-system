@@ -12,10 +12,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,6 +44,16 @@ public class ResumeController {
         jsonArray.addAll(resumeMapper.selectList(new QueryWrapper<>()));
         ret.put("error_message", "success");
         ret.put("data", jsonArray.toString());
+        return ret;
+    }
+
+    @PostMapping("resume/record/delete/")
+    private HashMap<String, String> deleteResume(@RequestParam HashMap<String, String> data){
+        HashMap<String, String> ret = new HashMap<>();
+        ret.put("error_message", "success");
+        String[] res = data.get("resumeKey").split(",");
+
+        ret.put("ret_code", String.valueOf(resumeMapper.deleteBatchIds(Arrays.asList(res))));
         return ret;
     }
     /**

@@ -8,7 +8,8 @@
             <el-table
                 style="width: 100%" border="true"
                 max-height=60vh
-                :data=uploadList
+                :data=store.state.cell_resume.list
+                @row-click="rowClick"
             >
                 <el-table-column
                     prop="index" label="序号"
@@ -18,10 +19,10 @@
                     prop="type" label="类型"
                     fixed="left" align="center" width="100"
                 ></el-table-column>
-                <el-table-column prop="filename" label="文件名" width="400"></el-table-column>
+                <el-table-column prop="filename" label="文件名" width="300"></el-table-column>
                 <el-table-column
-                    prop="status" label="分析状态"
-                    fixed="right" align="center" width="100"
+                    prop="stage" label="分析状态"
+                    fixed="right" align="center" width="200"
                     :filters=uploadStatusDict
                     :filter-method=statusFilterHandler
                     filter-placement="bottom-end"
@@ -32,18 +33,13 @@
 
                 <span style="font-size: 20px; color: #666666; margin-top: 0.5rem">总分析进度</span>
                 <span style="color: #888888; margin: 0.7rem 0 0 3rem">
-                    估计剩余时间 : <el-tag type="info" size="small" style="margin-top: -0.2rem">{{estimateTime}} s</el-tag>
+                    估计剩余时间 : <el-tag type="info" size="small" style="margin-top: -0.2rem">{{ (store.state.cell_resume.list.length - store.state.cell_resume.finish_num) * 40}} s</el-tag>
                 </span>
                 <div class="flex-grow" />
                 <el-button
-                    type="warning" plain
-                    :icon=VideoPause
-                    @click="statusChangeHandler('pause')"
-                >暂停分析</el-button>
-                <el-button
                     type="danger" plain
                     :icon=CircleClose
-                    @click="statusChangeHandler('stop')"
+                    @click="statusChangeHandler('#e6a23c')"
                 >中止分析</el-button>
                 <!-- @click="" -->
                 <el-button
@@ -54,14 +50,14 @@
             &nbsp;
             <el-row>
                 <el-progress
-                    :percentage="30"
+                    :percentage="(store.state.cell_resume.finish_num / store.state.cell_resume.list.length * 100).toFixed(2)"
                     :stroke-width="15"
                     striped
                     striped-flow
                     duration="5"
+                    :color="(store.state.cell_resume.finish_num / store.state.cell_resume.list.length * 100).toFixed(2) == 100.00 ? '#f56c6c' : status" 
                 />
             </el-row>
-
         </el-col>
         <el-col :span="1"/>
         <!--    详情细节-->
@@ -90,15 +86,16 @@
                                 :size="large"
                                 :style="blockMargin">
                                 <template #title>
-                                    <el-tag size="small" type="info" style="margin: -0.2rem 0.5rem 0 0">{{debugForm.index}}</el-tag>{{debugForm.filename}}
+                                    <el-tag size="small" type="info" style="margin: -0.2rem 0.5rem 0 0">{{store.state.cell_resume.list[current_ptr].index}}</el-tag>{{store.state.cell_resume.list[current_ptr].filename}}
                                 </template>
                                 <el-descriptions-item label="文件类型" :span="2">
-                                    <el-tag size="small" style="margin: -0.2rem 0.5rem 0 0">{{debugForm.type}}</el-tag>
+                                    <el-tag size="small" style="margin: -0.2rem 0.5rem 0 0">{{store.state.cell_resume.list[current_ptr].type}}</el-tag>
                                 </el-descriptions-item>
-                                <el-descriptions-item label="处理阶段">{{debugForm.stage}}</el-descriptions-item>
-                                <el-descriptions-item label="已运行时间">{{debugForm.time}}</el-descriptions-item>
+                                <el-descriptions-item label="处理阶段">{{store.state.cell_resume.list[current_ptr].stage}}</el-descriptions-item>
+                                <el-descriptions-item label="已运行时间">{{store.state.cell_resume.list[current_ptr].time}} s</el-descriptions-item>
                             </el-descriptions>
                         </el-col>
+                        
                     </el-row>
                 </el-collapse-item>
 <!--            代码细节-->
@@ -117,7 +114,6 @@
                 </el-collapse-item>
             </el-collapse>
             &nbsp;
-
         </el-col>
     </el-row>
 </template>
@@ -125,17 +121,37 @@
 
 <script>
 
-import {reactive, ref} from "vue";
+import { reactive, ref } from "vue";
 import router from '@/router';
+import { useStore } from 'vuex'
 
 export default {
     name: "AnalyseWaitingView",
 
     setup() {
-        const {PieChart, CircleClose, Finished, VideoPlay, VideoPause} = require('@element-plus/icons-vue');
-        const status = ref('');
+        document.body.onbeforeunload = function (event) { 
+            var c = event || window.event; 
+            if (/webkit/.test(navigator.userAgent.toLowerCase())) { 
+                return "离开页面将导致数据丢失！"; 
+            } 
+            else { 
+                c.returnValue = "离开页面将导致数据丢失！"; 
+            } 
+        }
+        document.oncontextmenu = function(){return false;}
+ 
+        document.onkeydown = function(event){
+                var e = event ||window.event || arguments.callee.caller.arguments[0];
+                if(e && e.keyCode==116){
+                    return false;
+                }
+        }
+        const { PieChart, CircleClose, Finished, VideoPlay, VideoPause } = require('@element-plus/icons-vue');
+        const status = ref('#409eff');
         const estimateTime = ref(0);
         const activeCollapse = ref(['1', '2']);
+        const store = useStore();
+
         const debugForm = reactive({
             index: '5',
             filename: '发的考试辅导.doc',
@@ -143,6 +159,7 @@ export default {
             stage: '输出为PDF',
             time: '7s',
         });
+
         const debugTerminal = ref('TOPIC\n    Windows PowerShell Help System\n\nSHORT DESCRIPTION\n    Displays help about Windows PowerShell cmdlets and concepts.\nSHORT DESCRIPTION\n'+
             '    Displays help about Windows PowerShell cmdlets and concepts.\n' +
             '\n' +
@@ -162,122 +179,17 @@ export default {
             '    Without help files, Get-Help displays auto-generated help for cmdlets,\n' +
             '    functions, and scripts.\n' +
             '# 程序有没有在运行?');
+
         const uploadStatusDict = ref([
             {text: '未上传', value: 'todo'},
             {text: '上传中', value: 'doing'},
             {text: '已上传', value: 'done'},
             {text: '错误', value: 'error'},
         ]);
-        const uploadList = ref([
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsbegaad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsbegaad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsjkanrbad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-            {   index:      1,
-                type:       'doc',
-                filename:   'fdsbegaad.doc',
-                status:     'todo',            },
-            {   index:      2,
-                type:       'pdf',
-                filename:   '489trhj.pdf',
-                status:     'doing',            },
-            {   index:      3,
-                type:       'img',
-                filename:   '23.png',
-                status:     'done',            },
-        ]);
+        const current_ptr = ref(0);
+        const rowClick = (row) =>{
+            current_ptr.value = row.index - 1;
+        }
         const statusFilterHandler = () => {
 
         };
@@ -291,13 +203,19 @@ export default {
 
         }
         const statusChangeHandler = (newStatus) => {
+            console.log(newStatus)
             status.value = newStatus;
+            // 清除所有计时器、切换状态
+            store.commit("stopParse")
         }
         const viewResultHandler = () => {
             router.push({ name:"mainPage" });
         }
 
         return {
+            current_ptr,
+            rowClick,
+            store,
             PieChart, CircleClose, Finished, VideoPlay, VideoPause,
             activeCollapse,
             debugForm,
@@ -305,7 +223,6 @@ export default {
             estimateTime,
             status,
             uploadStatusDict,
-            uploadList,
             statusChangeHandler,
             resumeHandler,
             pauseHandler,

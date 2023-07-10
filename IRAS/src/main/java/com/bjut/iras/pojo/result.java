@@ -13,9 +13,9 @@ import java.sql.Timestamp;
 public class result {
     @TableId(type = IdType.AUTO)
     private Integer resultkey;
-
     private Integer resumekey;
     private String resumename;
     private String parseresult;
+    private String state;
     private Timestamp createdtime;
 }

@@ -1,11 +1,9 @@
 <template>
     <el-menu
-        :default-active="activeIndex"
         class="el-navbar"
         mode="horizontal"
         background-color="#FBFBFB"
         :ellipsis="false"
-        @select="handleSelect"
     >
         <div class="logo-text">
             <el-button
@@ -21,8 +19,8 @@
         <el-menu-item index="1">XXX 的您，早上好!</el-menu-item>
         <el-menu-item index="2">
             <el-popover
-                width="300"
-                offset="15"
+                :width=300
+                :offset=30
                 popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;">
                 <template #reference>
                     <el-avatar

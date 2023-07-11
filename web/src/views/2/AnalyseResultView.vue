@@ -35,14 +35,14 @@
                         <el-button
                             size="small" plain
                             :icon=Folder
-                            @click="detailHandler(scope.$index, scope.row)"
+                            @click="detailHandler(scope.row.index)"
                         >个人详情</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             &nbsp;
 <!--        操作台-->
-            <el-row>
+            <el-row align="middle">
                 <el-button
                     type="warning" plain
                     :icon=Refresh
@@ -57,82 +57,85 @@
         </el-col>
         <el-col :span="1"/>
 <!--    右侧匹配岗位-->
-        <el-col :span="12">
-            <el-col>
-                <el-form :inline="true" :model=filterForm class="form">
-                    <el-form-item label="岗位筛选">
-                        <el-input
-                            v-model="filterForm.text"
-                            placeholder="输入以筛选岗位"
-                            clearable />
-                    </el-form-item>
-                </el-form>
-                &nbsp;
-                <el-collapse class="collapse" v-model=activeCollapse>
-                    <el-collapse-item v-for="post in PostList" :key="post.id" align="left">
-                        <template #title>
-                            <span class="collapse-item-title">{{ post.title }}</span>
-                        </template>
-                        <p></p>
-                        <span class="post-description">{{post.description}}</span>
-                        <el-table
-                            style="width: 100%" max-height="30vh"
-                            align="left"
-                            :data="filteredResumeList(post.id)"
-                            @selection-change="(selection)=>selectionChangeHandler(selection, 1)"
-                        >
-                            <el-table-column type="selection"/>
-                            <el-table-column
-                                prop="index" label="序号"
-                                width="80" align="right"
-                                sortable column-key="index"
-                            ></el-table-column>
-                            <el-table-column prop="name" label="应聘者" width="100"/>
-                            <el-table-column prop="tags" label="标签" width="200">
-                                <template #default="scope">
-                                    <el-tag v-for="tag in filteredResumeList(post.id)[scope.$index].tags" :key="tag" class="tag">
-                                        {{tag}}
-                                    </el-tag>
-                                </template>
-                            </el-table-column>
-                            <el-table-column width="125"  align="right" fixed="right">
-                                <template #header>
-                                    <el-input v-model="keyword" placeholder="输入即可检索" />
-                                </template>
-                                <template #default="scope">
-                                    <el-button
-                                        size="small" plain
-                                        :icon=Folder
-                                        @click="detailHandler(scope.$index, scope.row)"
-                                    >个人详情</el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        &nbsp;
-<!--                    移入移出按钮-->
-                        <el-row align="center">
-                            <el-button
-                                type="danger" plain
-                                :icon=Back
-                                @click="PPTransfer('L', post.id, post.selection)"
-                            >移出所选</el-button>
-                            <el-button
-                                type="primary" plain
-                                :icon=Right
-                                @click="PPTransfer('R', post.id, post.selection)"
-                            >移入所选</el-button>
-                        </el-row>
-                    </el-collapse-item>
-                </el-collapse>
-            </el-col>
+        <el-col :span="12" align="left">
+            <p style="font-size: 20px; color: #666666">已归类列表</p>
+            <el-form :model=filterForm  label-width="4.5rem">
+                <el-form-item label="岗位筛选">
+                    <el-input
+                        v-model="filterForm.text"
+                        placeholder="输入以筛选岗位"
+                        clearable
+                        class="input"/>
+                </el-form-item>
+            </el-form>
+            <el-collapse class="collapse" v-model=activeCollapse>
+                <el-collapse-item v-for="post in PostList" :key="post.id" align="left">
+                    <template #title>
+                        <span class="collapse-item-title">{{ post.title }}</span>
+                    </template>
+                    <p></p>
+                    <span class="post-description">{{post.description}}</span>
+                    <el-table
+                        style="width: 100%" max-height="30vh"
+                        align="left"
+                        :data="filteredResumeList(post.id)"
+                        @selection-change="(selection)=>selectionChangeHandler(selection, 1)"
+                    >
+                        <el-table-column type="selection"/>
+                        <el-table-column
+                            prop="index" label="序号"
+                            width="80" align="right"
+                            sortable column-key="index"
+                        ></el-table-column>
+                        <el-table-column prop="name" label="应聘者" width="100"/>
+                        <el-table-column prop="tags" label="标签" width="200">
+                            <template #default="scope">
+                                <el-tag v-for="tag in filteredResumeList(post.id)[scope.$index].tags" :key="tag" class="tag">
+                                    {{tag}}
+                                </el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column width="125"  align="right" fixed="right">
+                            <template #header>
+                                <el-input v-model="keyword" placeholder="输入即可检索" />
+                            </template>
+                            <template #default="scope">
+                                <el-button
+                                    size="small" plain
+                                    :icon=Folder
+                                    @click="detailHandler(scope.row.index)"
+                                >个人详情</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    &nbsp;
+                    <!--                    移入移出按钮-->
+                    <el-row align="middle">
+                        <el-button
+                            type="danger" plain
+                            :icon=Back
+                            @click="PPTransfer('L', post.id, post.selection)"
+                        >移出所选</el-button>
+                        <el-button
+                            type="primary" plain
+                            :icon=Right
+                            @click="PPTransfer('R', post.id, post.selection)"
+                        >移入所选</el-button>
+                    </el-row>
+                </el-collapse-item>
+            </el-collapse>
         </el-col>
     </el-row>
-    <ResumeDetail/>
+    <ResumeDetail
+        :is-visible="detailInfo.visible"
+        :resume-info="store.state.resume_info.list[detailInfo.index-1]"
+        @update:visible="detailInfo.visible=false"/>
 </template>
 
 <script>
 
 import {ref} from 'vue';
+import { useStore } from 'vuex';
 import ResumeDetail from "@/components/ResumeDetail";
 
 export default {
@@ -140,8 +143,10 @@ export default {
     components: {
         ResumeDetail
     },
+
     setup() {
         const {Back, Folder, Right, Refresh, Select} = require('@element-plus/icons-vue');
+        const store = useStore();
         const keyword = ref('');
         const activeCollapse = ref([]);
         const filterForm = ref({
@@ -224,6 +229,10 @@ export default {
             [],
             [],
         ]);
+        const detailInfo = ref({
+            visible: false,
+            index:  0
+        });
         // 返回tableId的内容
         const filteredResumeList = (tableId) => {
             // console.log('AnalyseResultView::filteredResumeList:tableId', tableId);
@@ -243,8 +252,10 @@ export default {
             }
             console.log('AnalyseResultView::selectionChangeHandler:list', selectionList.value);
         }
-        const detailHandler = (index) => {
-            console.log('AnalyseResultView::detailHandler:index', index);
+        const detailHandler = (rowIndex) => {
+            console.log('AnalyseResultView::detailHandler:rowIndex', rowIndex);
+            detailInfo.value.visible = true;
+            detailInfo.value.index = rowIndex;
         }
         const PPTransfer = (LorR, tableId) => {
             // console.log('AnalyseResultView::PPTransfer:LorR', LorR);
@@ -266,12 +277,14 @@ export default {
 
         return {
             Back, Folder, Right, Refresh, Select,
+            store,
             keyword,
             filterForm,
             resumeList,
             selectionList,
             PostList,
             activeCollapse,
+            detailInfo,
             filteredResumeList,
             detailHandler,
             selectionChangeHandler,
@@ -289,10 +302,12 @@ export default {
     margin-right: 0.3rem;
 }
 .collapse {
-    height: 70vh;
+    height: 60vh;
     overflow-y: auto;
 }
-
+.input {
+    width: 80%;
+}
 .collapse-item-title {
     font-size: 20px;
     color: #666666;

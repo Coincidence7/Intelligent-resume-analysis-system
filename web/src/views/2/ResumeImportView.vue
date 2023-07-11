@@ -5,7 +5,7 @@
     <el-row>
 <!--    表格部分-->
         <el-col :span="14">
-            <el-table 
+            <el-table
                 ref="multipleTable"
                 style="width: 100%"  max-height=65vh
                 :data="filteredUploadList()"
@@ -92,11 +92,10 @@
             <el-upload
                 class="upload"
                 drag
-                action=""
                 :auto-upload="false"
                 :on-change="onUploadChange"
-                multiple="true"
-                show-file-list="true"
+                :multiple="true"
+                :show-file-list="true"
                 :on-success="getRetData"
             >
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
@@ -136,9 +135,9 @@ export default {
         const {Delete, Document, Filter, PieChart} = require('@element-plus/icons-vue');
         let myFileList = []
         const filterMap = []
-        
+
         let { proxy } = getCurrentInstance();
-        
+
         filterMap['img'] = ['png', 'jpg', 'jpeg']
         filterMap['pdf'] = ['pdf']
         filterMap['doc'] = ['doc', 'docx']
@@ -148,7 +147,7 @@ export default {
         filterMap['doing'] = ['doing']
         filterMap['done'] = ['finish']
         filterMap['error'] = ['fail', 'stopped']
-        
+
         const store = useStore();
         const typeFilterDict = ref([
             {text: '图片', value: 'img'},
@@ -163,18 +162,10 @@ export default {
             {text: '已上传', value: 'done'},
             {text: '错误', value: 'error'},
         ]);
-        // const uploadList = ref<TableInstance>();
         const uploadInfo = ref({
             name: '',
             path: '',
         });
-        const filteredUploadList = () =>{
-            return uploadList.value.filter(
-                (data) =>
-                !search.value ||
-                data.filename.toLowerCase().includes(search.value.toLowerCase())
-            )
-        }
         const uploadList = ref([
             {   index:      1,
                 type:       'doc',
@@ -183,6 +174,13 @@ export default {
         ]);
         const search = ref('');
         let selection = []
+        const filteredUploadList = () =>{
+            return uploadList.value.filter(
+                (data) =>
+                    !search.value ||
+                    data.filename.toLowerCase().includes(search.value.toLowerCase())
+            )
+        }
         const getUploadList = () =>{
             $.ajax({
                 type: 'post',
@@ -194,7 +192,7 @@ export default {
                             index:      element.resumekey,
                             type:       element.type,
                             filename:   element.filename,
-                            status:     element.state,           
+                            status:     element.state,
                         })
                     });
                     filteredUploadList.value = uploadList.value
@@ -206,7 +204,7 @@ export default {
         }
 
         getUploadList();
-        
+
 
         const onUploadChange = (file, fileList) =>{
             // console.log(file.status)
@@ -221,11 +219,11 @@ export default {
         };
         const typeFilterHandler = (value, row) => {
             console.log(search.value)
-            
+
             if(value != 'other')
                 return filterMap[value].indexOf(row.type) != -1
             return Object.values(filterMap).flat(2).indexOf(row.type) == -1
-            
+
         };
         const statusFilterHandler = (value, row) => {
             if(value != 'other')
@@ -265,7 +263,7 @@ export default {
             console.log(index, row);
         }
         const startAnalyse = () => {
-  
+
             // 获取待检测列表
             let files_proccess = []
             for(let i = 0; i < myFileList.length; i++){
@@ -293,7 +291,7 @@ export default {
                 return pwd;
             }
             const hashMap = [];
-            // 新增一条数据   
+            // 新增一条数据
             for(let i = 0; i < myFileList.length; i++){
                 let file = myFileList[i]
 
@@ -303,7 +301,7 @@ export default {
 
                 myFormData.append(alias, file.raw)
 
-                
+
                 // 每个文件有自己的计时器
                 hashMap[alias] = i;
                 let item = setInterval(() => {
@@ -334,7 +332,7 @@ export default {
                         // }
 
                         let str = original_data[0].original_name
-                        
+
                         let file_proccess = {
                             index: 0,
                             filename: str,
@@ -345,7 +343,7 @@ export default {
 
                         let alias_str = original_data[0].alias
                         // 结束指定计时器
-                        
+
                         store.commit("updateOneResumeRecord", {
                             element: file_proccess,
                             idx: hashMap[alias_str]
@@ -372,8 +370,8 @@ export default {
                                 }
                             })
                         }
-                        
-                        
+
+
 
                     },
                     error: (resp)=>{
@@ -381,10 +379,10 @@ export default {
                     }
                 })
             }
-            
-            
+
+
             router.push({name: 'analyse_waiting'});
-       
+
         }
 
 

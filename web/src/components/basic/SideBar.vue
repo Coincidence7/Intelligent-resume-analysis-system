@@ -3,8 +3,8 @@
         <el-col>
             <el-menu
                 class="el-sidebar"
-                :default-active="2"
-                :default-openeds="openeds"
+                :default-active="menuDefaultActive"
+                :default-openeds="menuDefaultOpened"
                 @select=currentSelect
             >
                 <el-menu-item index="1" @click=handleSelect>
@@ -45,6 +45,7 @@
 
 <script>
 
+import { ref } from 'vue';
 import router from '@/router';
 import {
     Connection,
@@ -76,6 +77,8 @@ export default {
     },
 
     setup() {
+        const menuDefaultActive = ref('1');
+        const menuDefaultOpened = ref(['1', '3']);
         const urlDict = {
             '1':   'overview',
             '2-1': 'resume_import',
@@ -100,6 +103,8 @@ export default {
         }
 
         return {
+            menuDefaultActive,
+            menuDefaultOpened,
             currentSelect,
             handleSelect,
         }

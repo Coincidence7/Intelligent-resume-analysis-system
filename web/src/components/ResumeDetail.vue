@@ -4,6 +4,7 @@
         width="85%"
         title="人才详情title"
         :close-on-press-escape="false"
+        :close-on-click-modal="false"
         :show-close="false"
         >
         <template #header>

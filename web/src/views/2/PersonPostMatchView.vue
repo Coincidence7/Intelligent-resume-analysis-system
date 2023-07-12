@@ -91,9 +91,10 @@
 
 <script>
 
-import {ref} from 'vue';
+import { ref } from 'vue';
 import { useStore } from 'vuex';
 import ResumeDetail from "@/components/ResumeDetail";
+import $ from 'jquery'
 
 export default {
     name: "PersonPostMatchView",
@@ -261,18 +262,74 @@ export default {
             console.log('matchClickedHandler');
             filteredResultList();
         }
+        const calAge = (year) =>{
+            if(year == undefined){
+                return ''
+            }
+            let birth = new Date(year)
+            if (isNaN(birth)) return ''
+            let age = new Date().getFullYear() - birth.getFullYear()
+            return age == undefined ? '' : age
+        }
+
+        const calExp = (Exp) => {
+            let list = []
+            Exp.forEach(item =>{
+                list.push({
+                    title:  item,
+                    time:   '',
+                    description: item
+                })
+            })
+
+            return list
+        }
+
         const filteredResultList = () => {
             console.log('filteredResultList');
-            let list = store.state.resume_info.list;
+            // let list = store.state.resume_info.list;
             resultList.value = [];
-            list.forEach(resume => {
-                resume.predict.forEach(pre => {
-                    if(pre.postId === valueForm.value){
-                        resultList.value.push(resume);
-                    }
-                })
-            });
-            console.log('filteredResultList:', resultList.value);
+            
+            $.ajax({
+                url: store.state.httpUrl + 'position/matching/',
+                type: 'POST',
+                data:{
+                    jobName: postSelectForm.value.postList[valueForm.value].name
+                },
+                success: (resp) =>{
+                    // console.log(resp)
+                    let list = JSON.parse(resp.data)
+                    resultList.value = []
+                    let idx = 0
+                    list.forEach(item => {
+                        let result = JSON.parse(item.parseresult)
+                        // console.log(result[0])
+                        resultList.value.push({
+                            id: idx++,
+                            name: result[0].姓名[0] == undefined ? '无名氏': result[0].姓名[0],
+                            score: 70,
+                            gender: '男',
+                            age:   calAge(result[0].年龄[0]),
+                            maxDegree: result[0].学历[0] == '' ? '本科': result[0].学历[0],
+                            maxSchool: result[0].学校[0],
+                            maxMajor:  result[0].专业[0],
+                            desiredPostName:'大声叫兽',
+                            workStartYear:  result[0].工作日期[0],
+                            email:      result[0].邮箱[0],
+                            phone:      result[0].电话[0],
+                            experience: calExp(result[0].工作经历)
+                        })
+                    })
+                    // console.log(result)
+                    
+                   
+                },
+                error: (resp) =>{
+                    console.log(resp)
+                }
+            })
+            
+            // console.log('filteredResultList:', resultList.value);
         }
         const selectionChangeHandler = (selection) => {
             selectionList.value = [];

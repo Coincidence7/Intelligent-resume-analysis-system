@@ -105,7 +105,7 @@
 <script>
 
 import {ref, reactive} from 'vue';
-// import { useStore } from 'vuex'
+import { useStore } from 'vuex'
 // import router from '@/router/index'
 import "@/assets/font/font.css";
 
@@ -120,9 +120,10 @@ export default {
             username: '',
             password: '',
         });
-        // const store = useStore();
+        const store = useStore();
         // const jwt_token = localStorage.getItem("jwt_token");
-
+        let username = ref('')
+        let password = ref('')
         let isLogin = ref(false);
         let isRegister = ref(false);
         let error_msg = ref(' ');
@@ -130,9 +131,23 @@ export default {
             window.location.href="javascript:history.go(-1)";
         }
         const login = () => {
-            isLogin.value = true;
-            isRegister.value = false;
-            // error_msg.value = 'good';
+            error_msg.value = " ";
+            store.dispatch("login", {
+                username: username.value,
+                password: password.value,
+                success() {
+                    console.log(username)
+                    // store.dispatch("getInfo", {
+                    //     success(){
+                    //         router.push({ name: "home" });
+                    //         location.reload()
+                    //     }
+                    // })
+                },
+                error() {
+                    error_msg.value = "用户名或密码错误";
+                }
+            })
         }
         const register = () => {
             isRegister.value = false;

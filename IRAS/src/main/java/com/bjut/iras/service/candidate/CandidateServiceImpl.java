@@ -1,5 +1,6 @@
 package com.bjut.iras.service.candidate;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -30,15 +31,12 @@ public class CandidateServiceImpl implements CandidateService{
             return null;
         }
 
-        JSONObject jobj = new JSONObject();
-        int i = 0;
-        for (candidate c : candidates) {
-            jobj.put("result" + i, c.toString());
-            i++;
-        }
+        JSONArray jsonArray = new JSONArray();
+
+        jsonArray.addAll(candidates);
 
         HashMap<String, String> retMap = new HashMap<>();
-        retMap.put("resumes", jobj.toJSONString());
+        retMap.put("resumes", jsonArray.toString());
         retMap.put("size", Integer.toString(Math.min(QueryConstants.resumePageCapacity, candidates.size())));
 
         return retMap;
@@ -114,6 +112,10 @@ public class CandidateServiceImpl implements CandidateService{
 
             } else if (filterType == QueryConstants.byCandTarget){
                 qw.like("candtarget", e.getValue());
+
+                if (isDesc) qw.orderByDesc("candkey");
+            } else if (filterType == QueryConstants.byCandJob){
+                qw.between("candjob", e.getValue(), 45);
 
                 if (isDesc) qw.orderByDesc("candkey");
             }

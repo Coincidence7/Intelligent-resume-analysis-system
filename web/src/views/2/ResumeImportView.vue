@@ -325,11 +325,7 @@ export default {
                         // console.log(resp)
                         let idxs = JSON.parse(resp.resume_keys)
                         let original_data = JSON.parse(resp.original_data)
-                        // let data = resp.data
                         let msg = resp.error_message
-                        // if(msg == 'success'){
-                        //     data = JSON.parse(resp.data)
-                        // }
 
                         let str = original_data[0].original_name
 
@@ -356,6 +352,7 @@ export default {
                                 url: store.state.httpUrl + "parser/result/",
                                 type: 'POST',
                                 data:{
+                                    error_message: msg,
                                     resumekey: idxs[0],
                                     resumename: "简历",
                                     parseresult: resp.data,

@@ -18,4 +18,5 @@ public class result {
     private String parseresult;
     private String state;
     private Timestamp createdtime;
+    private String jobname;
 }

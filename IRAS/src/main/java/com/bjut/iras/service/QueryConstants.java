@@ -23,6 +23,7 @@ public class QueryConstants {
     public static int byCandLoc = 0xF3;
     public static int byCandTitle = 0xF4;
     public static int byCandTarget = 0xF5;
+    public static int byCandJob = 0xF6;
 
     public static int byTicketJobType = 0xE0;
     public static int byTicketJobStatus = 0xE1;
@@ -63,7 +64,7 @@ public class QueryConstants {
         supportedCandidateFilters.put("byCandLoc", byCandLoc);
         supportedCandidateFilters.put("byCandTitle", byCandTitle);
         supportedCandidateFilters.put("byCandTarget", byCandTarget);
-
+        supportedCandidateFilters.put("byCandJob", byCandJob);
     }
 
     private static void initSupportedTicketFilters() {

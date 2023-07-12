@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * @Author Luo'xing'yue
- * @CreateTime 2022-09-02
+ * @CreateTime 2023-07-02
  * @这是一个权限配置，用于在未登录时放开某些页面
  */
 
@@ -48,6 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(
+                        "/position/matching/select/",
+                        "/position/matching/",
                         "/resume/record/delete/",
                         "/parser/result/",
                         "/resume/List/",

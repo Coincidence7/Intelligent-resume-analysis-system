@@ -17,14 +17,14 @@ public class candidate {
 
     private String candname;
     private Integer candage;
-    private Short candgender;
+    private String candgender;
     private String candemail;
     private String candtel;
     private String candloc;
     private String candpo;
     private String candschool;
     private String candtitle;
-    private String candjob;
+    private Integer candjob;
     private String candskill;
     private String candaward;
     private String candeval;

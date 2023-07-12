@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bjut.iras.controller.parser.ResumeController;
+import com.bjut.iras.pojo.candidate;
 import com.bjut.iras.pojo.resume;
+import com.bjut.iras.service.candidate.CandidateService;
 import com.bjut.iras.service.resume.ResumeService;
+import com.bjut.iras.utils.Cal;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -122,21 +125,28 @@ public class FileServiceImpl implements FileService {
 
         // 发送上传请求
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(requestBody, requestHeaders);
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://127.0.0.1:3001",
-                requestEntity, String.class);
+        try{
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://10.18.25.194:3001",
+                    requestEntity, String.class);
 
-        log.log(Level.INFO, responseEntity.getBody().toString());
+            log.log(Level.INFO, responseEntity.getBody());
+            JSONObject obj = JSON.parseObject(responseEntity.getBody());
 
-        JSONObject obj = JSON.parseObject(responseEntity.getBody());
-        if("success".equals(obj.getString("error_message"))){
-            ret.put("error_message", "success");
-            ret.put("data", obj.getString("data"));
-        }else {
+            if("success".equals(obj.getString("error_message"))){
+                ret.put("error_message", "success");
+                ret.put("data", obj.getString("data"));
+            }else {
+                ret.put("error_message", "fail");
+                ret.put("data", obj.getString("reason"));
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
             ret.put("error_message", "fail");
-            ret.put("data", obj.getString("reason"));
+        }finally {
+            ret.put("original_data", jsonArray.toString());
+            ret.put("resume_keys", resumeKeys.toString());
         }
-        ret.put("original_data", jsonArray.toString());
-        ret.put("resume_keys", resumeKeys.toString());
 
         return ret;
     }

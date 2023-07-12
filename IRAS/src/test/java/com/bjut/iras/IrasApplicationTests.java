@@ -4,12 +4,16 @@ import com.bjut.iras.service.QueryConstants;
 import com.bjut.iras.service.candidate.CandidateService;
 import com.bjut.iras.service.result.ResultService;
 import com.bjut.iras.service.resume.ResumeService;
+import com.bjut.iras.utils.Cal;
 import org.junit.jupiter.api.Test;
+import org.python.icu.util.Calendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SpringBootTest
 class IrasApplicationTests {
@@ -21,6 +25,24 @@ class IrasApplicationTests {
     @Autowired
     CandidateService candidateService;
 
+    @Test
+    void CalWorkYearTest(){
+
+        String res = "[\"2020-01至2021-10\"]";
+        System.out.println(Cal.CalWorkYear(res));
+        System.out.println(Cal.CalWorkYear("[\"2010/01/02至2014/10-10\"]"));
+        System.out.println(Cal.CalWorkYear("[\"2010.01/02 2014-10.10\"]"));
+        System.out.println(Cal.CalWorkYear("[\"2010.01/02 至今\"]"));
+        System.out.println(Cal.CalWorkYear("[\"2010.01/02\"]"));
+        System.out.println(Cal.CalWorkYear("[]"));
+    }
+    @Test
+    void CalAgeTest(){
+        System.out.println(Cal.CalAge("2004-"));
+        System.out.println(Cal.CalAge("2004-12"));
+        System.out.println(Cal.CalAge("2004-1"));
+        System.out.println(Cal.CalAge("12"));
+    }
     public static String ascii2native(String ascii) {
 
         int n = ascii.length() / 6;

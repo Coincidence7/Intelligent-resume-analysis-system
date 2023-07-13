@@ -14,6 +14,7 @@ import PostManageView from "@/views/4/PostManageView";
 import AppSettingView from "@/views/5/AppSettingView";
 import NotFoundView from "@/views/NotFoundView";
 import AnalyseWaitingView from "@/views/2/AnalyseWaitingView";
+import AnalyseResultView from "@/views/2/AnalyseResultView";
 
 const routes = [
   {
@@ -62,6 +63,14 @@ const routes = [
     path: "/AnalyseWaitingView",
     name: "analyse_waiting",
     component: AnalyseWaitingView,
+    meta: {
+      requestAuth: true
+    }
+  },
+  {
+    path: "/analyseResultView",
+    name: "analyse_result",
+    component: AnalyseResultView,
     meta: {
       requestAuth: true
     }

@@ -1,22 +1,26 @@
 <template>
     <el-menu
-        :default-active="activeIndex"
         class="el-navbar"
         mode="horizontal"
         background-color="#FBFBFB"
         :ellipsis="false"
-        @select="handleSelect"
     >
         <div class="logo-text">
-            <el-button class="back-btn" size="large" type="info" :icon="Back" plain/>
+            <el-button
+                class="back-btn"
+                size="large"
+                type="info"
+                :icon="Back" plain
+                @click="pageBack"
+            />
             <strong id="title">GustingBamboo - 智能简历分析系统</strong>
         </div>
         <div class="flex-grow" />
         <el-menu-item index="1">XXX 的您，早上好!</el-menu-item>
         <el-menu-item index="2">
             <el-popover
-                width="300"
-                offset="15"
+                :width=300
+                :offset=30
                 popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;">
                 <template #reference>
                     <el-avatar
@@ -101,7 +105,7 @@
 <script>
 
 import {ref, reactive} from 'vue';
-// import { useStore } from 'vuex'
+import { useStore } from 'vuex'
 // import router from '@/router/index'
 import "@/assets/font/font.css";
 
@@ -116,17 +120,34 @@ export default {
             username: '',
             password: '',
         });
-        // const store = useStore();
+        const store = useStore();
         // const jwt_token = localStorage.getItem("jwt_token");
-
+        let username = ref('')
+        let password = ref('')
         let isLogin = ref(false);
         let isRegister = ref(false);
         let error_msg = ref(' ');
-
+        const pageBack = () => {
+            window.location.href="javascript:history.go(-1)";
+        }
         const login = () => {
-            isLogin.value = true;
-            isRegister.value = false;
-            // error_msg.value = 'good';
+            error_msg.value = " ";
+            store.dispatch("login", {
+                username: username.value,
+                password: password.value,
+                success() {
+                    console.log(username)
+                    // store.dispatch("getInfo", {
+                    //     success(){
+                    //         router.push({ name: "home" });
+                    //         location.reload()
+                    //     }
+                    // })
+                },
+                error() {
+                    error_msg.value = "用户名或密码错误";
+                }
+            })
         }
         const register = () => {
             isRegister.value = false;
@@ -146,6 +167,7 @@ export default {
             isLogin,
             isRegister,
             error_msg,
+            pageBack,
             login,
             register,
             logout,

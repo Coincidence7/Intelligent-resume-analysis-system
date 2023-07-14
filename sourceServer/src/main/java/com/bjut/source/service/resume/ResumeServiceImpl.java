@@ -11,6 +11,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -101,11 +102,14 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
-    public HashMap<String, String> addFile(String path) {
+    public HashMap<String, String> addFile(ArrayList<String> paths) {
 
-        file file = new file();
-        file.setPath(path);
-        resumeMapper.insert(file);
+        for(String path: paths){
+            file file = new file();
+            file.setPath(path);
+            resumeMapper.insert(file);
+        }
+
         HashMap<String, String> ret = new HashMap<>();
         ret.put("error_message", "success");
         return ret;

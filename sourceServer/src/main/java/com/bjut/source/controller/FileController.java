@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @RestController
@@ -30,8 +32,9 @@ public class FileController {
     }
 
     @PostMapping("/resume/upload/")
-    public HashMap<String, String> upload(@RequestParam String path){
-        return resumeService.addFile(path);
+    public HashMap<String, String> upload(@RequestParam HashMap<String, String> files){
+        ArrayList<String> paths = new ArrayList<>(files.values());
+        return resumeService.addFile(paths);
     }
 
 }

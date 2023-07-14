@@ -55,7 +55,7 @@ public class FileServiceImpl implements FileService {
         JSONArray jsonArray = new JSONArray();
         List<FileSystemResource> UpLoadFiles = new ArrayList<>();
         ArrayList<resume> resumes = new ArrayList<>();
-
+        ArrayList<String> paths = new ArrayList<>();
 
         for(int i = 0; i < files.length; i++){
 
@@ -69,7 +69,7 @@ public class FileServiceImpl implements FileService {
             long l = System.currentTimeMillis();
 
             String fileNames = l + "." + originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-            String uploadDesk = "D:\\uploadFiles\\raw\\";
+            String uploadDesk = "D:\\uploadFiles\\temp\\";
             File finalFile = new File(uploadDesk + fileNames);
             if(!finalFile.getParentFile().exists()){
                 finalFile.getParentFile().mkdirs();
@@ -94,6 +94,7 @@ public class FileServiceImpl implements FileService {
                 myResume.setType(originalFilename.substring(originalFilename.lastIndexOf('.') + 1));
                 myResume.setUploadtime(new Timestamp(System.currentTimeMillis()));
                 resumes.add(myResume);
+                paths.add(uploadDesk + fileNames);
                 FileSystemResource resource = new FileSystemResource(finalFile);
                 UpLoadFiles.add(resource);
                 jsonArray.add(jsonObject);
@@ -120,16 +121,29 @@ public class FileServiceImpl implements FileService {
         // 构建请求体
         MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
 
+        MultiValueMap<String, Object> requestBodyRes = new LinkedMultiValueMap<>();
+
+        requestBody.addAll("upload_paths[]", paths);
+
         requestBody.add("upload_files_num", UpLoadFiles.size());
         requestBody.addAll("upload_files[]", UpLoadFiles);
 
         // 发送上传请求
         HttpEntity<MultiValueMap> requestEntity = new HttpEntity<MultiValueMap>(requestBody, requestHeaders);
+
+        HttpEntity<MultiValueMap> requestEntityRes = new HttpEntity<MultiValueMap>(requestBodyRes, requestHeaders);
+
         try{
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://10.18.25.194:3001",
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://127.0.0.1:3001",
                     requestEntity, String.class);
 
+            ResponseEntity<String> responseEntityRes = restTemplate.postForEntity("http://127.0.0.1:3002/resume/upload/",
+                    requestEntityRes, String.class);
+
+            log.log(Level.INFO, responseEntityRes.getBody());
+
             log.log(Level.INFO, responseEntity.getBody());
+
             JSONObject obj = JSON.parseObject(responseEntity.getBody());
 
             if("success".equals(obj.getString("error_message"))){

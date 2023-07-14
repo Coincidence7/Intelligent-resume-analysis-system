@@ -16,7 +16,7 @@
             <strong id="title">GustingBamboo - 智能简历分析系统</strong>
         </div>
         <div class="flex-grow" />
-        <el-menu-item index="1">XXX 的您，早上好!</el-menu-item>
+        <el-menu-item index="1">尊敬的{{store.state.user.username}}，您好!</el-menu-item>
         <el-menu-item index="2">
             <el-popover
                 :width=300
@@ -38,7 +38,7 @@
                     </el-row>
                     &nbsp;
                     <el-row justify="center">
-                        <span style="font-size: 20px">竹林风</span>
+                        <span style="font-size: 20px">{{ store.state.user.username }}</span>
                     </el-row>
                     &nbsp;
                     <el-row justify="center">
@@ -59,13 +59,13 @@
                         <el-row>
                             <el-form :model="form">
                                 <el-form-item label="用户名" label-width="5rem">
-                                    <el-input v-model="form.userkey" placeholder="请输入用户名" autocomplete="off" />
+                                    <el-input v-model="form.username" placeholder="请输入用户名" autocomplete="off" />
                                 </el-form-item>
                                 <el-form-item label="用户密码" label-width="5rem">
                                     <el-input v-model="form.password" placeholder="请输入密码" type="password" show-password autocomplete="off" />
                                 </el-form-item>
                                 <el-form-item label="密码确认" label-width="5rem">
-                                    <el-input v-model="form.password" placeholder="请再次输入密码" type="password" show-password autocomplete="off" />
+                                    <el-input v-model="form.comfirmedpassword" placeholder="请再次输入密码" type="password" show-password autocomplete="off" />
                                 </el-form-item>
                             </el-form>
                         </el-row>
@@ -106,8 +106,11 @@
 
 import {ref, reactive} from 'vue';
 import { useStore } from 'vuex'
+
 // import router from '@/router/index'
+
 import "@/assets/font/font.css";
+import $ from 'jquery'
 
 export default {
     name: "NavBar",
@@ -115,43 +118,61 @@ export default {
     },
 
     setup(){
+      const store = useStore();
+      // let username = ref('');
+      // let password = ref('');
+      // let confirmedPassword = ref('');
         const {Back, UserFilled} = require('@element-plus/icons-vue');
         const form = reactive({
             username: '',
             password: '',
+            comfirmedpassword: ''
         });
-        const store = useStore();
-        // const jwt_token = localStorage.getItem("jwt_token");
-        let username = ref('')
-        let password = ref('')
+
         let isLogin = ref(false);
         let isRegister = ref(false);
         let error_msg = ref(' ');
         const pageBack = () => {
             window.location.href="javascript:history.go(-1)";
         }
-        const login = () => {
-            error_msg.value = " ";
-            store.dispatch("login", {
-                username: username.value,
-                password: password.value,
-                success() {
-                    console.log(username)
-                    // store.dispatch("getInfo", {
-                    //     success(){
-                    //         router.push({ name: "home" });
-                    //         location.reload()
-                    //     }
-                    // })
-                },
-                error() {
-                    error_msg.value = "用户名或密码错误";
-                }
+
+      const login = () => {
+        console.log(form.username)
+        error_msg.value = " ";
+        store.dispatch("login", {
+          username: form.username,
+          password: form.password,
+          success(resp) {
+            console.log("登录成功", resp)
+            isLogin.value = true
+            store.commit("showUser",{
+              username: form.username,
+              is_login: true
             })
-        }
-        const register = () => {
-            isRegister.value = false;
-            // error_msg.value = 'good';
+          },
+          error() {
+            error_msg.value = "用户名或密码错误";
+          }
+        })
+      }
+      const register = () => {
+          $.ajax({
+            url: "http://127.0.0.1:3000/user/account/register/",
+            type: 'post',
+            data: {
+              username: form.username,
+              password: form.password,
+              confirmedPassword: form.comfirmedpassword,
+            },
+            success(resp) {
+              console.log(resp)
+              error_msg.value = resp.error_message;
+            },
+            error(resp) {
+              console.log(resp);
+            }
+          });
+
         }
         const logout = () => {
             isLogin.value = false;
@@ -172,6 +193,7 @@ export default {
             register,
             logout,
             toggle,
+            store
         }
     }
 }

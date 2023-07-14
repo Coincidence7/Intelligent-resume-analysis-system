@@ -22,6 +22,10 @@ export default{
                 localStorage.setItem("visitPhoto", "")
             }
         },
+        showUser(state, user) {
+            state.username = user.username;
+            state.is_login = user.is_login;
+        },
         updateUser(state, user) {
             state.id = user.id;
             state.username = user.username;
@@ -269,11 +273,11 @@ export default{
                 },
                 success(resp) {
                     if (resp.error_message === "success") {
-                        localStorage.setItem("jwt_token", resp.token);
-                        context.commit("updateToken", resp.token);
+                        // localStorage.setItem("jwt_token", resp.token);
+                        // context.commit("updateToken", resp.token);
                         data.success(resp);
                     } else {
-                        data.error(resp);
+                        data.error();
                     }
 
                 },
@@ -286,9 +290,6 @@ export default{
             $.ajax({
                 url: "http://127.0.0.1:3000/user/account/info/",
                 type: 'get',
-                headers: {
-                    Authorization: "Bearer " + context.state.token,
-                },
                 success(resp) {
                     if (resp.error_message === "success") {
                         context.commit("updateUser", {

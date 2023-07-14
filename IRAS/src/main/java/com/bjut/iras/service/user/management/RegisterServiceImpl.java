@@ -16,8 +16,7 @@ import java.util.Map;
 public class RegisterServiceImpl implements RegisterService {
     @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
 
     @Override
     public Map<String, String> register(String username, String password, String confirmedPassword) {
@@ -53,20 +52,19 @@ public class RegisterServiceImpl implements RegisterService {
         }
 
         QueryWrapper<user> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userName", username);
+        queryWrapper.eq("username", username);
         List<user> users = userMapper.selectList(queryWrapper);
         if (!users.isEmpty()) {
             map.put("error_message", "用户名已存在");
             return map;
         }
 
-        String encodedPwd = passwordEncoder.encode(password);
         String avatarURI = "https://cdn.acwing.com/media/user/profile/photo/74595_lg_14adcae966.jpg";
         userMapper.insert(new user(
                 null,
                 Integer.parseInt(Long.toString(System.currentTimeMillis()).substring(0, 6)),
                 username,
-                encodedPwd,
+                password,
                 avatarURI
         ));
         map.put("error_message", "success");

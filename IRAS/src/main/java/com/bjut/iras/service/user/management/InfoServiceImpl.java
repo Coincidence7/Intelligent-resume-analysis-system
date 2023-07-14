@@ -20,17 +20,8 @@ public class InfoServiceImpl implements InfoService {
     private UserMapper userMapper;
     @Override
     public Map<String, String> getInfo() {
-        UsernamePasswordAuthenticationToken authenticationToken =
-                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
-        UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
-        user user = loginUser.getUser();
-
         Map<String, String> map = new HashMap<>();
-        map.put("error_message", "success");
-        map.put("id", user.getUserkey().toString());
-        map.put("username", user.getUsername());
-        map.put("photo", user.getAvataruri());
+
         return map;
     }
 

@@ -48,8 +48,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(
+
                         "/position/matching/select/",
                         "/position/matching/",
+
+                        "/user/account/info/",
+
                         "/resume/record/delete/",
                         "/parser/result/",
                         "/resume/List/",

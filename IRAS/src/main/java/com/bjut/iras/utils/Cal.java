@@ -9,6 +9,7 @@ public class Cal {
     public static int CalAge(String date){
         try{
             if(date.length() >= 4) return Calendar.getInstance().get(Calendar.YEAR) - Integer.parseInt(date.substring(0, 4));
+            if(date.length() == 0) return 20 + (int)Math.ceil(Math.random() * 10);
             return Integer.parseInt(date);
         }catch (Exception e){
             e.printStackTrace();

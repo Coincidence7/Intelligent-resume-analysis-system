@@ -307,7 +307,7 @@ export default {
                         resultList.value.push({
                             id: idx++,
                             name: result[0].姓名[0] == undefined ? '无名氏': result[0].姓名[0],
-                            score: 70,
+                            score: Math.floor(Math.random() * 100),
                             gender: '男',
                             age:   calAge(result[0].年龄[0]),
                             maxDegree: result[0].学历[0] == '' ? '本科': result[0].学历[0],

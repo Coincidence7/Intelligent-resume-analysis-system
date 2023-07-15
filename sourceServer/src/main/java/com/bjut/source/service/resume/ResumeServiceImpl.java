@@ -102,11 +102,12 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     @Override
-    public HashMap<String, String> addFile(ArrayList<String> paths) {
+    public HashMap<String, String> addFile(ArrayList<String> paths, ArrayList<String> keys) {
 
-        for(String path: paths){
+        for(int i = 0; i < paths.size(); i++){
             file file = new file();
-            file.setPath(path);
+            file.setPath(paths.get(i));
+            file.setResumekey(Integer.parseInt(keys.get(i)));
             resumeMapper.insert(file);
         }
 

@@ -125,6 +125,13 @@ export default {
         }
         const previewHandler = (index, row) => {
             console.log(index, row);
+          if(historyList.value[index].status == 'finish'){
+            if(filterMap['img'].indexOf(historyList.value[index].type) != -1){
+              window.open(store.state.httpUrlRes + "image/?resumeKey=" + row.index, "_blank", "charset=utf-8");
+            }else {
+              window.open(store.state.httpUrlRes + "resume/path/?resumeKey=" + row.index + '?response-content-type=application/pdf', "_blank", "charset=utf-8");
+            }
+          }
         }
         const historyDeleteHandler = (index, row) => {
             console.log('# ResumeImport::historyDeleteHandler', index, row);

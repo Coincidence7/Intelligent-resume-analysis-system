@@ -93,12 +93,12 @@
                                 
                                 <div style="align-items: center">
                                     <el-avatar :icon="Avatar" />
-                                    <span style="margin-left: 1rem">{{listLayout.data[2 * (i - 1) + j - 1].candname}}</span>
+                                    <span style="margin-left: 1rem">{{listLayout.data[2 * (i - 1) + j - 1].candname ? listLayout.data[2 * (i - 1) + j - 1].candname : '无名氏'}}</span>
                                 </div>
                                 <el-button
                                     plain
                                     :icon=Folder
-                                    @click="detailHandler(2 * (i) + j)"
+                                    @click="detailHandler(2 * (i - 1) + j - 1)"
                                 >个人详情</el-button>
                             </div>
                         </template>
@@ -127,7 +127,7 @@
     </el-row>
     <ResumeDetail
         :is-visible="detailInfo.visible"
-        :resume-info="store.state.resume_info.list[detailInfo.index-1]"
+        :resume-info="resultList[detailInfo.index - 1]"
         @update:visible="detailInfo.visible=false"/>
 </template>
 
@@ -185,7 +185,7 @@ export default {
         hashMapDegree[2] = '学士'
         hashMapDegree[3] = '硕士'
         hashMapDegree[4] = '博士'
-
+        const resultList = ref([])
         const filterForm = ref({
             keyword: '',
             age: [0, 100],
@@ -249,10 +249,28 @@ export default {
         const detailHandler = (resumeId) => {
             console.log('detailHandler:rowIndex', resumeId);
             detailInfo.value.visible = true;
+            // 根据 candidatekey 获取信息
+            resultList.value = []
+            resultList.value.push({
+                id: 0,
+                name: !listLayout.value.data[resumeId].candname ? '无名氏': listLayout.value.data[resumeId].candname,
+                score: Math.floor(Math.random() * 100),
+                gender: '男',
+                age:   listLayout.value.data[resumeId].candage,
+                maxDegree: listLayout.value.data[resumeId].candtitle,
+                maxSchool: listLayout.value.data[resumeId].candschool,
+                maxMajor:  "",
+                desiredPostName: listLayout.value.data[resumeId].candtarget,
+                workStartYear:  listLayout.value.data[resumeId].candjob,
+                email:      listLayout.value.data[resumeId].candemail,
+                phone:      listLayout.value.data[resumeId].candtel,
+                experience: []
+            })
             // detailInfo.value.index = resumeId;
             
         }
         return {
+            resultList,
             Avatar, Check, Close, Folder, Refresh, Search,
             listLayout,
             filterForm,

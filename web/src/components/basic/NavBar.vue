@@ -111,6 +111,7 @@ import { useStore } from 'vuex'
 
 import "@/assets/font/font.css";
 import $ from 'jquery'
+import {ElNotification} from "element-plus";
 
 export default {
     name: "NavBar",
@@ -138,12 +139,25 @@ export default {
 
       const login = () => {
         console.log(form.username)
+        if (form.username === '' || form.password === ''){
+          ElNotification({
+            title: 'Error',
+            message: '登陆信息不可为空!',
+            type: 'error',
+          });
+          return;
+        }
         error_msg.value = " ";
         store.dispatch("login", {
           username: form.username,
           password: form.password,
           success(resp) {
             console.log("登录成功", resp)
+            ElNotification({
+              title: 'Success',
+              message: '登陆成功,下午好!',
+              type: 'success',
+            });
             isLogin.value = true
             store.commit("showUser",{
               username: form.username,
@@ -152,10 +166,31 @@ export default {
           },
           error() {
             error_msg.value = "用户名或密码错误";
+            ElNotification({
+              title: 'Error',
+              message: '用户名或密码错误，请检查后重新输入!',
+              type: 'error',
+            });
           }
         })
       }
       const register = () => {
+          if (form.username === '' || form.password === '' || form.comfirmedpassword === ''){
+            ElNotification({
+              title: 'Error',
+              message: '注册信息不完整，请输入完整的注册信息!',
+              type: 'error',
+            });
+            return;
+          }
+          if(form.password !== form.comfirmedpassword){
+            ElNotification({
+              title: 'Error',
+              message: '两次输入的密码不相同，请检查后重新输入!',
+              type: 'error',
+            });
+            return;
+          }
           $.ajax({
             url: "http://127.0.0.1:3000/user/account/register/",
             type: 'post',
@@ -167,15 +202,30 @@ export default {
             success(resp) {
               console.log(resp)
               error_msg.value = resp.error_message;
+              ElNotification({
+                title: 'Success',
+                message: '注册成功',
+                type: 'success',
+              });
             },
             error(resp) {
               console.log(resp);
+              ElNotification({
+                title: 'Error',
+                message: '注册信息冲突，请更换用户名!',
+                type: 'error',
+              });
             }
           });
 
         }
         const logout = () => {
-            isLogin.value = false;
+          isLogin.value = false;
+          ElNotification({
+            title: 'Info',
+            message: '用户已登出，请工作结束后关闭该会话',
+            type: 'info',
+          });
         }
         const toggle = () => {
             isRegister.value = !isRegister.value;

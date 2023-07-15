@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class file {
-    @TableId(type = IdType.AUTO)
+    @TableId
     private Integer resumekey;
     private String path;
 }

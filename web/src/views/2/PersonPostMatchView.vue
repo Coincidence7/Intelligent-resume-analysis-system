@@ -35,14 +35,14 @@
                 <el-button
                     type="info" plain
                     :icon="Edit"
-                    >
+                    @click="editClickedHandler">
                     编辑或添加岗位信息</el-button>
                 <div class="flex-grow" />
                 <el-button
                     type="primary" plain
                     :icon="Search"
                     @click="matchClickedHandler">
-                    开始人才匹配</el-button>
+                    开始人岗匹配</el-button>
             </el-row>
 
         </el-col>
@@ -95,6 +95,7 @@ import { ref } from 'vue';
 import { useStore } from 'vuex';
 import ResumeDetail from "@/components/ResumeDetail";
 import $ from 'jquery'
+import router from '@/router';
 
 export default {
     name: "PersonPostMatchView",
@@ -262,6 +263,9 @@ export default {
             console.log('matchClickedHandler');
             filteredResultList();
         }
+        const editClickedHandler = () => {
+            router.push({ name:"post_manage" });
+        }
         const calAge = (year) =>{
             if(year == undefined){
                 return ''
@@ -289,7 +293,7 @@ export default {
             console.log('filteredResultList');
             // let list = store.state.resume_info.list;
             resultList.value = [];
-            
+
             $.ajax({
                 url: store.state.httpUrl + 'position/matching/',
                 type: 'POST',
@@ -321,14 +325,14 @@ export default {
                         })
                     })
                     // console.log(result)
-                    
-                   
+
+
                 },
                 error: (resp) =>{
                     console.log(resp)
                 }
             })
-            
+
             // console.log('filteredResultList:', resultList.value);
         }
         const selectionChangeHandler = (selection) => {
@@ -353,6 +357,7 @@ export default {
             detailInfo,
             filteredResultList,
             matchClickedHandler,
+            editClickedHandler,
             selectionChangeHandler,
             detailHandler,
         }

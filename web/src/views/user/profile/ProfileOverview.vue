@@ -5,7 +5,7 @@
 <!--      他人主页左栏-->
           <div class="col-2" v-if="is_visit != -1">
               <div class="row">
-                  <img :src="visitPhoto" class="rounded float-start" :alt="visitPhoto">  
+                  <img :src="visitPhoto" class="rounded float-start" :alt="visitPhoto">
               </div>
               <div class="row" style="margin-top: 5vh">
                   <p class="text-center">{{visitUsername}}</p>
@@ -188,6 +188,7 @@ import { useStore } from 'vuex'
 import { ref } from 'vue'
 import $ from 'jquery'
 import router from "@/router"
+import {ElMessage} from "element-plus";
 
 export default {
   name: "ProfileDetailView",
@@ -196,10 +197,10 @@ export default {
     CalendarHeatmap
   },
   setup(){
-    
+
     const store = useStore();
     const jwt_token = localStorage.getItem("jwt_token");
-    
+
     let date = new Date()
     let endDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     let submissionList = ref([]);
@@ -222,7 +223,7 @@ export default {
 
             store.commit("addFriend", {
               userName : is_visit.value == -1 ? store.state.user.username : visitUsername.value,
-              userKey : is_visit.value == -1 ? store.state.user.id : is_visit.value 
+              userKey : is_visit.value == -1 ? store.state.user.id : is_visit.value
             })
             store.commit("addEmptyContent")
           }
@@ -239,7 +240,7 @@ export default {
           })
         }
       })
-      
+
     }
     const ToSolution =(item) =>{
       console.log(item)
@@ -337,7 +338,8 @@ export default {
             update_pages()
           },
           error(resp) {
-            console.log(resp)
+              console.log(resp);
+              ElMessage.error('Oops, 服务未连接');
           }
         })
       }else{
@@ -402,7 +404,7 @@ export default {
                         headers: {
                             Authorization: "Bearer " + jwt_token,
                         },
-                        success(resp) { 
+                        success(resp) {
                             visitSubmissionList.value = resp.submissionList
                             visitUsername.value = localStorage.getItem("visitUsername");
                             visitPhoto.value = localStorage.getItem("visitPhoto");
@@ -456,7 +458,7 @@ export default {
             }
             arrTemp.push(data[i])
           }
-          
+
           return arrTemp
         }
       }

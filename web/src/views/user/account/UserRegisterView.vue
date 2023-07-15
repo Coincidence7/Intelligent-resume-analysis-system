@@ -67,12 +67,13 @@
         </div>
     </ContentField>
  </template>
-   
+
  <script>
 import ContentField from '@/components/ContentField.vue'
 import {ref} from 'vue'
 import router from '@/router/index'
 import $ from 'jquery'
+import {ElMessage} from "element-plus";
 export default {
     components: {ContentField},
     setup() {
@@ -99,6 +100,7 @@ export default {
                 },
                 error(resp) {
                     console.log(resp);
+                    ElMessage.error('Oops, 服务未连接');
                 }
             });
         }
@@ -113,7 +115,7 @@ export default {
     }
 }
  </script>
- 
+
  <style scoped>
  div.error_message{
    color: red

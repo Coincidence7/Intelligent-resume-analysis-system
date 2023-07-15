@@ -73,7 +73,7 @@
                     type="primary" plain
                     :icon=Search
                     @click="resumeFilterHandler"
-                >执行人岗匹配</el-button>
+                >执行人才检索</el-button>
             </el-row>
         </el-col>
         <el-col :span="2"/>
@@ -81,16 +81,16 @@
         <el-col :span="15" align="left">
             <p style="font-size: 20px; color: #666666">检索结果</p>
             <div style="overflow: auto; height: 65vh; padding-left: 0">
-                
+
                 <el-row v-for="i in listLayout.rowCount" :key="i">
                     <el-card
                         v-for="j in (i === listLayout.rowCount && listLayout.isOdd) ? 1: 2" :key="j"
                         class="box-card-list-item" shadow="hover" style="width: 20vw">
-                        
+
                         <template #header>
-                            
+
                             <div class="card-header">
-                                
+
                                 <div style="align-items: center">
                                     <el-avatar :icon="Avatar" />
                                     <span style="margin-left: 1rem">{{listLayout.data[2 * (i - 1) + j - 1].candname ? listLayout.data[2 * (i - 1) + j - 1].candname : '无名氏'}}</span>
@@ -267,7 +267,7 @@ export default {
                 experience: []
             })
             // detailInfo.value.index = resumeId;
-            
+
         }
         return {
             resultList,

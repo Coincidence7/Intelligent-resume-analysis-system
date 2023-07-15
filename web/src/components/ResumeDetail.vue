@@ -34,7 +34,7 @@
                         <el-tag class="tag" v-for="tag in resumeInfo.tags" :key="tag">{{tag}}</el-tag>
                     </el-descriptions-item>
                 </el-descriptions>
-
+                <br/>
                 <p style="font-size: 20px; color: #888888">工作/项目经历</p>
                 <el-collapse v-model="activeCollapse">
                     <el-collapse-item v-for="exp in resumeInfo.experience" :key="exp" align="left">
@@ -67,10 +67,13 @@
 
                     </el-table>
                 </el-row>
-                &nbsp;
+                <br/>
                 <!--        人才画像-->
                 <el-row  style="max-height: 60vh">
                     <p style="font-size: 20px; color: #888888">人才画像</p>
+                </el-row>
+                <el-row>
+                    <ResumeRadar width="16vw" height="27vh" :data="radarData"/>
                 </el-row>
             </el-col>
         </el-row>
@@ -81,6 +84,8 @@
 <script>
 // eslint-disable-next-line no-unused-vars
 import { ref, toRef } from 'vue';
+import ResumeRadar from "@/components/ResumeRadar";
+
 
 export default {
 
@@ -92,10 +97,18 @@ export default {
     emits: [
         'update:visible'
     ],
+    components: {
+        ResumeRadar
+    },
 
     setup(props, context) {
         const dialogVisible = toRef(props, 'isVisible');
         const activeCollapse = ref([]);
+        const radarData = ref([
+            // TODO 这些数字应如何生成
+            [30, 23, 40, 100, 86, 89, 94, 74, 34, 23],
+            [20, 80, 98, 67, 47],
+        ]);
         // const resumeInfo = ref({
         //     // 必须字段
         //     name:       '嫩爹我啊',
@@ -153,9 +166,11 @@ export default {
         const setHide = () => {
             context.emit('update:visible', false);
         }
+
         return {
             activeCollapse,
             // resumeInfo,
+            radarData,
             dialogVisible,
             rowClassHandler,
             setHide,

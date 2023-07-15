@@ -53,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/position/matching/",
 
                         "/user/account/info/",
-
+                        "/position/submit/",
                         "/resume/record/delete/",
                         "/parser/result/",
                         "/resume/List/",

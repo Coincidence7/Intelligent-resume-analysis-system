@@ -8,9 +8,7 @@
                 <!--    输入表单-->
                 <el-form label-position="right" label-width="140px" style="max-width: 100vw">
                     <el-row>
-                        <!--            subtitle-->
-                        <!--                <h2 id="基础用法" class="subtitle">基础用法<a class="header-anchor vp-link" href="#基础用法" aria-hidden="true">#</a></h2>-->
-                        <span class="subtitle">接口设置</span>
+                        <p style="font-size: 20px; color: #666666">接口设置</p>
                         <el-space fill>
                             <el-alert type="info" show-icon :closable="false" align="left">
                                 <p>移动云API服务对每个请求进行身份验证，提交请求需要在请求中包含签名信息。 其中：</p>
@@ -48,15 +46,16 @@
                             </el-form-item>
                         </el-space>
                         &nbsp;
-    
                     </el-row>
                 </el-form>
+                <br/>
+                <el-button
+                    type="primary" plain
+                    :icon="Check"
+                    @click="saveClickedHandler">保存接口配置</el-button>
             </el-col>
             <el-col :span="1"/>
             <el-col :span="12" align="left">
-                <el-button
-                    type="warning" plain
-                >暂停分析</el-button>
             </el-col>
         </el-row>
     </div>
@@ -66,10 +65,13 @@
 <script>
 
 import {ref} from "vue";
+import { ElMessage } from 'element-plus';
+
 export default {
     name: "AppSettingView",
 
     setup() {
+        const { Check } = require('@element-plus/icons-vue');
         const settingForm = ref({
             ocrUrl: '',
             ocrAccessKey: '',
@@ -77,22 +79,19 @@ export default {
             pdfImplement: '',
             pdfUrl: '',
         });
+        const saveClickedHandler = () => {
+            ElMessage.success('配置信息保存成功');
+        }
 
         return {
+            Check,
             settingForm,
-
+            saveClickedHandler,
         }
     }
 }
 </script>
 
 <style scoped>
-
-.subtitle {
-    color: #666666;
-    font-size: 18px;
-    font-weight: bold;
-    padding-bottom: 1rem;
-}
 
 </style>

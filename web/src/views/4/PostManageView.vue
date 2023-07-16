@@ -20,7 +20,8 @@
             <el-table
                 :data=postList
                 style="width: 100%" :border="true"
-                max-height=80vh
+                max-height=65vh
+                :scrollbar-always-on="true"
                 highlight-current-row
                 @row-click="postSelectHandler">
                 <el-table-column
@@ -56,20 +57,29 @@
                         class="content"/>
                 </el-form-item>
                 <el-form-item label="岗位薪酬">
-                    <el-input-number
-                        v-model="postForm.postSalary"
-                        :min="0" :max="99999999"
-                        class="content"
-                        controls-position="right"
-                        style="margin-left: 1rem; width:10rem"/>
+                    <el-row>
+                        <el-input-number
+                            v-model="postForm.postSalaryMin"
+                            :min="0" :max="99999999"
+                            class="content"
+                            controls-position="right"
+                            style="margin-left: 1rem; width:10rem"/>
+                        <span style="margin-left: 1rem">-</span>
+                        <el-input-number
+                            v-model="postForm.postSalaryMax"
+                            :min="postForm.postSalaryMin" :max="99999999"
+                            class="content"
+                            controls-position="right"
+                            style="width:10rem"/>
+                    </el-row>
                 </el-form-item>
-                <el-form-item label="岗位描述">
+                <el-form-item label="岗位技能">
                     <el-input
-                        v-model="postForm.postDescription"
+                        v-model="postForm.postSkill"
                         :rows="5"
                         :maxlength="200" show-word-limit
                         class="content" type="textarea"
-                        placeholder="请输入岗位描述"/>
+                        placeholder="请输入岗位所需技能"/>
                 </el-form-item>
                 <el-form-item label="岗位职责">
                     <el-input
@@ -133,15 +143,15 @@
                 <el-form-item label="经验要求">
                     <el-row>
                         <el-switch
-                            :v-model="postForm.isExpReq"
+                            v-model="postForm.isTimeReq"
                             inline-prompt
                             :active-icon="Check"
                             :inactive-icon="Close"
                             class="content"
                         />
                         <el-input-number
-                            v-model="postForm.skillReq"
-                            :disabled="!postForm.isExpReq"
+                            v-model="postForm.workTime"
+                            :disabled="!postForm.isTimeReq"
                             :min="0"
                             :max="100"
                             controls-position="right"
@@ -159,7 +169,6 @@
 
 import {ref} from 'vue';
 import $ from "jquery";
-// import router from "@/router";
 import { useStore } from 'vuex';
 import { toRaw } from'@vue/reactivity';
 import { ElMessage } from 'element-plus';
@@ -175,8 +184,10 @@ export default {
             {
                 postId: 0,
                 postName: '啦啦啦',
-                postSalary: 5000,
+                postSalaryMin: 5000,
+                postSalaryMax: 5000,
                 postDescription: '的付款就啥都发ui夫人饿啊开发节节课恢复健康发',
+                postSkill: '',
                 postResponsibility: '犯得上看见浩方丢失; 发的是客户发u; 发的哈萨克;',
 
                 sexReq: '男',
@@ -184,15 +195,16 @@ export default {
                 majorReq: '',
                 workCity: '北京',
                 workTime: 0,
-                skillReq: '',
 
-                isExpReq: false,
+                isTimeReq: false,
             },
             {
                 postId: 1,
                 postName: '呜呜呜乙',
-                postSalary: 3950,
+                postSalaryMin: 3950,
+                postSalaryMax: 3950,
                 postDescription: '范德萨范德萨课恢复健康发',
+                postSkill: '',
                 postResponsibility: '犯得上的; 发的哈萨克;',
 
                 sexReq: '不限',
@@ -200,15 +212,16 @@ export default {
                 majorReq: '',
                 workCity: '不限',
                 workTime: 0,
-                skillReq: '',
 
-                isExpReq: false,
+                isTimeReq: false,
             },
             {
                 postId: 3,
                 postName: '乙',
-                postSalary: 12,
+                postSalaryMin: 12,
+                postSalaryMax: 12,
                 postDescription: '范德萨健康发',
+                postSkill: '',
                 postResponsibility: '发的哈萨克;',
 
                 sexReq: '女',
@@ -216,16 +229,17 @@ export default {
                 majorReq: '',
                 workCity: '台湾',
                 workTime: 0,
-                skillReq: '',
 
-                isExpReq: false,
+                isTimeReq: false,
             },
         ]);
         const postForm = ref({
             postId: 5,
             postName: '',
-            postSalary: 0,
+            postSalaryMin: 0,
+            postSalaryMax: 0,
             postDescription: '',
+            postSkill: '',
             postResponsibility: '',
 
             sexReq: '',
@@ -233,9 +247,8 @@ export default {
             majorReq: '',
             workCity: '',
             workTime: 0,
-            skillReq: '',
 
-            isExpReq: false,
+            isTimeReq: false,
         });
         const formSexOption = ref([{
             value: '不限',
@@ -312,8 +325,38 @@ export default {
             },
         ];
         const error_message = ref('');
-        const postListLoad = () => {
-            ElMessage.warning('芜~');
+        const getPostList = () => {
+            $.ajax({
+                type: 'post',
+                url: store.state.httpUrl + "position/list/",
+                success: (resp) =>{
+                    postList.value = [];
+                    JSON.parse(resp.data).forEach(element => {
+                        postList.value.push({
+                            postId:             element.positionkey,
+                            postName:           element.posname,
+                            postSalaryMin:      Number(element.possalary.split('-')[0]),
+                            postSalaryMax:      Number(element.possalary.split('-')[1]),
+                            postDescription:    element.posdescription,
+                            postSkill:          element.posskill,
+                            postResponsibility: element.posresponsibility,
+
+                            sexReq:             element.sex,
+                            titleReq:           element.title,
+                            majorReq:           element.major,
+                            workCity:           element.workcity,
+                            workTime:           Number(element.worktime),
+
+                            isTimeReq:          Number(element.worktime) !== 0,
+                        })
+                    });
+                    ElMessage.info('岗位列表已同步为最新');
+                },
+                error: (resp) =>{
+                    console.log(resp);
+                    ElMessage.error('getPostList: ' + JSON.stringify(toRaw(resp)));
+                }
+            });
         }
         const postSelectHandler = (row) => {
             postEditStatus.value = 'selected';
@@ -327,8 +370,10 @@ export default {
             postForm.value = {
                 postId: 5,
                 postName: '',
-                postSalary: 0,
+                postSalaryMin: 0,
+                postSalaryMax: 0,
                 postDescription: '',
+                postSkill: '',
                 postResponsibility: '',
 
                 sexReq: '',
@@ -336,9 +381,8 @@ export default {
                 majorReq: '',
                 workCity: '',
                 workTime: 0,
-                skillReq: '',
 
-                isExpReq: false,
+                isTimeReq: false,
             };
             postEditStatus.value = 'new';
         }
@@ -353,20 +397,21 @@ export default {
                     url: store.state.httpUrl + "position/submit/",
                     type: 'post',
                     data: {
-                        posname:        postForm.value.postName,
-                        possalary:      postForm.value.postSalary,
-                        posdescription: postForm.value.postDescription,
-                        projcetexp:     postForm.value.postResponsibility,
+                        name:           postForm.value.postName,
+                        salary:         postForm.value.postSalaryMin + '-' + postForm.value.postSalaryMax,
+                        skill:          postForm.value.postSkill,
+                        responsibility: postForm.value.postResponsibility,
 
                         sex:            postForm.value.sexReq,
                         title:          postForm.value.titleReq,
                         major:          postForm.value.majorReq,
-                        workcity:       postForm.value.workCity,
-                        workexp:        postForm.value.skillReq,
+                        workCity:       postForm.value.workCity,
+                        workTime:       postForm.value.workTime,
                     },
                     success(resp) {
                         if (resp.error_message === "success") {
-                            console.log("666")
+                            ElMessage.success('岗位添加成功!');
+                            getPostList();
                         } else {
                             error_message.value = resp.error_message;
                             ElMessage.error(JSON.stringify(toRaw(resp)));
@@ -374,14 +419,15 @@ export default {
                     },
                     error(resp) {
                         console.log(resp);
-                        ElMessage.error('Oops, 服务未连接' + JSON.stringify(toRaw(resp)));
+                        ElMessage.error(JSON.stringify(toRaw(resp)));
                     }
                 });
-                postList.value.push(postForm.value);
             }
-            postListLoad();
             postEditStatus.value = 'unselect';
         }
+
+        getPostList();
+
         return{
             Check, Close, Plus,
             postEditStatus,

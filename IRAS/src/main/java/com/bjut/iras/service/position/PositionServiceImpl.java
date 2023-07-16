@@ -17,11 +17,11 @@ public class PositionServiceImpl implements PositionService{
     private PositionMapper positionMapper;
 
     @Override
-    public Map<String, String> submit_position(String sex, String posname, String possalary, String title, String major,
-                                               String workcity, String posdescription, String workexp, String projcetexp){
+    public Map<String, String> submitPosition(String name, String salary, String title, String sex, String major,
+                                              String workCity, String workTime, String skill, String responsibility){
         Map<String, String> map = new HashMap<>();
         QueryWrapper<position> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("posname", posname);
+        queryWrapper.eq("posname", name);
         List<position> position = positionMapper.selectList(queryWrapper);
         if (!position.isEmpty()) {
             map.put("error_message", "该岗位已存在");
@@ -30,15 +30,15 @@ public class PositionServiceImpl implements PositionService{
 
         positionMapper.insert(new position(
                 null,
-                posname,
-                possalary,
-                sex,
+                name,
+                salary,
                 title,
+                sex,
                 major,
-                workcity,
-                posdescription,
-                workexp,
-                projcetexp
+                workCity,
+                workTime,
+                skill,
+                responsibility
         ));
         map.put("error_message", "success");
         return map;

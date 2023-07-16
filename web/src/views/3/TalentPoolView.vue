@@ -8,10 +8,10 @@
             <p style="font-size: 20px; color: #666666">检索条件</p>
             <el-form :model="filterForm" label-width="5rem">
                 <el-form-item label="检索词">
-                    <el-input v-model="filterForm.keyword" :clearable="true" width="100%"/>
+                    <el-input v-model="filterForm.keyword" :clearable="true" width="100%" class="content"/>
                 </el-form-item>
                 <el-form-item label="学历要求">
-                    <el-select v-model="filterForm.maxDegree" placeholder="最低学历要求">
+                    <el-select v-model="filterForm.maxDegree" placeholder="最低学历要求" class="content">
                         <el-option-group
                             v-for="group in formDegreeOption"
                             :key="group.value"
@@ -31,6 +31,7 @@
                             inline-prompt
                             :active-icon="Check"
                             :inactive-icon="Close"
+                            class="content"
                         />
                         <el-input-number
                             v-model="filterForm.workYear"
@@ -50,6 +51,7 @@
                             inline-prompt
                             :active-icon="Check"
                             :inactive-icon="Close"
+                            class="content"
                         />
                         <el-radio-group
                             v-model="filterForm.experience"
@@ -299,5 +301,8 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+.content {
+    margin-left: 1rem;
 }
 </style>
